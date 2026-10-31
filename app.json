@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "WinKPop",
+    "slug": "winkpop",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "winkpop",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#F3EDFB"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.winkpop.app"
+    },
+    "android": {
+      "package": "com.winkpop.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#F3EDFB"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router", "expo-font"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
