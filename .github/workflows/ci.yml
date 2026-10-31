@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
 
+# Shared install logic: use the fast, cached `npm ci` when a committed
+# lockfile exists; otherwise fall back to `npm install` (which also generates
+# the lockfile). This keeps CI green whether or not package-lock.json is
+# committed yet. Once you run `npm install` locally and commit the resulting
+# package-lock.json, the `npm ci` path kicks in automatically.
 jobs:
   # Typecheck, lint, and run the unit + component test suite.
   test:
@@ -15,8 +20,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test -- --coverage
@@ -36,8 +42,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
       - run: npx expo export --platform web
       - uses: actions/upload-artifact@v4
         with:
@@ -54,8 +61,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e:web
       - uses: actions/upload-artifact@v4
