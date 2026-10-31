@@ -65,15 +65,15 @@ globs in `tailwind.config.js` (currently `./app/**` and `./src/**`).
 
 ## 5. Common errors & fixes
 
-| Symptom | Likely cause | Fix |
-| --- | --- | --- |
-| `Unable to resolve module @/...` | Metro cache is stale after adding a file | Restart with `npx expo start -c` (clears cache) |
-| Tailwind classes have no effect | File not matched by `content` globs, or Metro cache | Check `tailwind.config.js`; restart with `-c` |
-| Blank white screen on launch | A render-time throw before first paint | Check the terminal/console for the stack trace |
-| `Port 8081 already in use` | A previous dev server is still running | Kill it, or let Expo pick another port |
-| iOS build fails after dependency change | Native cache | `npx expo start -c`; for bare workflow, `cd ios && pod install` |
-| Android emulator can't reach Metro | ADB reverse not set | `adb reverse tcp:8081 tcp:8081`, then reload |
-| Fonts look like the system default | Custom font not loaded | Fonts fall back to `System` by design until you add `expo-font` assets |
+| Symptom                                 | Likely cause                                        | Fix                                                                    |
+| --------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
+| `Unable to resolve module @/...`        | Metro cache is stale after adding a file            | Restart with `npx expo start -c` (clears cache)                        |
+| Tailwind classes have no effect         | File not matched by `content` globs, or Metro cache | Check `tailwind.config.js`; restart with `-c`                          |
+| Blank white screen on launch            | A render-time throw before first paint              | Check the terminal/console for the stack trace                         |
+| `Port 8081 already in use`              | A previous dev server is still running              | Kill it, or let Expo pick another port                                 |
+| iOS build fails after dependency change | Native cache                                        | `npx expo start -c`; for bare workflow, `cd ios && pod install`        |
+| Android emulator can't reach Metro      | ADB reverse not set                                 | `adb reverse tcp:8081 tcp:8081`, then reload                           |
+| Fonts look like the system default      | Custom font not loaded                              | Fonts fall back to `System` by design until you add `expo-font` assets |
 
 **Clear all caches (the "turn it off and on again"):**
 

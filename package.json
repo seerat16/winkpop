@@ -15,6 +15,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:e2e:web": "playwright test --config e2e/web/playwright.config.ts",
+    "test:e2e:native": "maestro test e2e/native/flows",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\""
   },
   "dependencies": {
@@ -41,6 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@playwright/test": "^1.49.1",
     "@testing-library/react-native": "^12.9.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~18.3.12",

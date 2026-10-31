@@ -24,14 +24,14 @@ single purpose-built app, with the features collectors actually asked for:
 
 ## Tech stack (all free & open source)
 
-| Concern | Choice | Why |
-| --- | --- | --- |
-| App framework | **Expo + React Native + Expo Router** | One codebase for iOS, Android, and Web — maximum component reuse |
-| Language | **TypeScript** (strict) | Type-safe end to end |
-| Styling | **NativeWind** (Tailwind for RN) | Same utility classes on every platform |
-| State & persistence | **Zustand** + AsyncStorage | Tiny, cross-platform, no boilerplate |
-| Icons / vectors | **lucide-react-native** + **react-native-svg** | Crisp on all platforms |
-| Testing | **Jest** + **@testing-library/react-native** | Unit + component tests |
+| Concern             | Choice                                                                | Why                                                              |
+| ------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| App framework       | **Expo + React Native + Expo Router**                                 | One codebase for iOS, Android, and Web — maximum component reuse |
+| Language            | **TypeScript** (strict)                                               | Type-safe end to end                                             |
+| Styling             | **NativeWind** (Tailwind for RN)                                      | Same utility classes on every platform                           |
+| State & persistence | **Zustand** + AsyncStorage                                            | Tiny, cross-platform, no boilerplate                             |
+| Icons / vectors     | **lucide-react-native** + **react-native-svg**                        | Crisp on all platforms                                           |
+| Testing             | **Jest** + RNTL · **Playwright** (web E2E) · **Maestro** (native E2E) | Unit, component & end-to-end on every platform                   |
 
 The app runs today against a **typed mock data layer** (`src/data/`). That layer
 is the single seam where a real backend (e.g. Supabase, also open source) plugs
@@ -48,6 +48,9 @@ npm run web          # open the app in your browser
 npm run ios          # open the iOS simulator  (macOS only)
 npm run android      # open the Android emulator
 npm start            # start the dev server and pick a platform interactively
+
+npm test             # unit + component tests (all platforms, via jsdom)
+npm run test:e2e:web # Playwright web E2E (after: npx playwright install)
 ```
 
 Then log in with any email/password, or tap **"Explore as demo collector"** to
@@ -79,12 +82,12 @@ winkpop/
 
 ## Documentation
 
-| Doc | What's inside |
-| --- | --- |
-| [`docs/RUNNING.md`](docs/RUNNING.md) | How to run each platform (Web, iOS, Android), prerequisites, env setup |
-| [`docs/DEBUGGING.md`](docs/DEBUGGING.md) | DevTools, logs, common errors + fixes, per-platform debugging |
-| [`docs/TESTING.md`](docs/TESTING.md) | How to write & run tests, coverage, what to test |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Data layer, component system, swapping in a real backend |
+| Doc                                            | What's inside                                                          |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| [`docs/RUNNING.md`](docs/RUNNING.md)           | How to run each platform (Web, iOS, Android), prerequisites, env setup |
+| [`docs/DEBUGGING.md`](docs/DEBUGGING.md)       | DevTools, logs, common errors + fixes, per-platform debugging          |
+| [`docs/TESTING.md`](docs/TESTING.md)           | How to write & run tests, coverage, what to test                       |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Data layer, component system, swapping in a real backend               |
 
 ## License
 

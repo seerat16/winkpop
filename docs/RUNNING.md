@@ -93,14 +93,14 @@ npm start
 
 This opens the Expo CLI. Press:
 
-| Key | Action |
-| --- | --- |
-| `w` | open **web** |
-| `i` | open **iOS** simulator |
+| Key | Action                    |
+| --- | ------------------------- |
+| `w` | open **web**              |
+| `i` | open **iOS** simulator    |
 | `a` | open **Android** emulator |
-| `r` | reload the app |
-| `j` | open the JS debugger |
-| `m` | toggle the dev menu |
+| `r` | reload the app            |
+| `j` | open the JS debugger      |
+| `m` | toggle the dev menu       |
 
 ---
 
@@ -121,11 +121,11 @@ Read them in code via `process.env.EXPO_PUBLIC_SUPABASE_URL`.
 
 ## 7. Useful scripts
 
-| Command | What it does |
-| --- | --- |
-| `npm start` | start the dev server (pick a platform) |
-| `npm run web` / `ios` / `android` | start on a specific platform |
-| `npm run typecheck` | run the TypeScript compiler (no emit) |
-| `npm run lint` | run ESLint |
-| `npm test` | run the Jest test suite |
-| `npm run format` | format with Prettier |
+| Command                           | What it does                           |
+| --------------------------------- | -------------------------------------- |
+| `npm start`                       | start the dev server (pick a platform) |
+| `npm run web` / `ios` / `android` | start on a specific platform           |
+| `npm run typecheck`               | run the TypeScript compiler (no emit)  |
+| `npm run lint`                    | run ESLint                             |
+| `npm test`                        | run the Jest test suite                |
+| `npm run format`                  | format with Prettier                   |

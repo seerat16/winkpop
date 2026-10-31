@@ -1,70 +1,72 @@
 # Testing WinKPop
 
-The project uses **Jest** (via `jest-expo`) with
-**@testing-library/react-native** for component tests.
+WinKPop ships with three layers of automated testing, all free & open source:
+
+| Layer                | Tool                                 | Runs where                       | Command                   |
+| -------------------- | ------------------------------------ | -------------------------------- | ------------------------- |
+| **Unit + component** | Jest + @testing-library/react-native | Node (jsdom) — platform-agnostic | `npm test`                |
+| **Web E2E**          | Playwright                           | real Chromium + mobile viewport  | `npm run test:e2e:web`    |
+| **Native E2E**       | Maestro                              | iOS simulator + Android emulator | `npm run test:e2e:native` |
+
+CI (`.github/workflows/ci.yml`) runs typecheck, lint, the unit/component suite,
+a web build, and the Playwright web E2E on every push and PR.
 
 ---
 
-## 1. Running tests
+## 1. Unit + component tests (Jest)
 
 ```bash
 npm test                 # run the whole suite once
-npm run test:watch       # re-run on file changes
+npm run test:watch       # re-run on file changes (fast local loop)
 npm run test:coverage    # run with a coverage report
 npm test -- search       # run only files matching "search"
 ```
 
-> Use `npm run test:watch` locally for the fast feedback loop. In CI, prefer the
-> single-run `npm test`.
+The Jest preset is `jest-expo`, so the **same tests validate logic for all three
+platforms** — they run against the shared React Native component tree in jsdom.
 
----
+### What's covered
 
-## 2. What's tested today
+**Pure data layer** (highest value, cheapest to test — covered exhaustively):
 
-The highest-value, highest-risk logic is the **pure data layer** — the
-photocard-native search and the price-intelligence engine. These are the core
-differentiators from the product research, and being pure functions they are
-cheap to test exhaustively.
+- `src/data/__tests__/search.test.ts` — group/member/era/type/price filters,
+  free-text query, every sort order, filter combinations, input immutability.
+- `src/data/__tests__/priceHistory.test.ts` — deterministic history, stat
+  ordering (low ≤ avg ≤ high), unknown-card handling.
+- `src/data/__tests__/userStore.test.ts` — login/signup validation, like/cart/
+  wishlist/collection toggles, collecting-groups update, logout.
 
-- `src/data/__tests__/search.test.ts` — group/member/era/type/price filtering,
-  free-text query, every sort order, filter combinations, and input immutability.
-- `src/data/__tests__/priceHistory.test.ts` — deterministic history generation,
-  stat ordering (low ≤ avg ≤ high), and unknown-card handling.
+**Shared components & screens:**
+
+- `src/components/__tests__/Button.test.tsx` — press, disabled, loading states.
+- `src/components/__tests__/Chip.test.tsx` — press + selected accessibility state.
+- `src/components/__tests__/PhotocardTile.test.tsx` — renders card info, routes to
+  detail, toggles cart/likes through the store, shows SOLD OUT.
+- `app/__tests__/cart.test.tsx` — empty state, subtotal + 5% buyer-protection +
+  total math, removing a card.
 
 This follows the research's own prioritisation formula
-(`priority = severity × failure-probability ÷ cost-to-test`): search and pricing
-are high-severity and cheap to test, so they're covered first.
+(`priority = severity × failure-probability ÷ cost-to-test`).
 
----
-
-## 3. Writing a logic (unit) test
-
-Put it next to the code under test in a `__tests__/` folder:
+### Writing a unit test
 
 ```ts
-// src/data/__tests__/example.test.ts
-import { searchPhotocards } from "../search";
-import { PHOTOCARDS } from "../photocards";
+import { searchPhotocards } from "@/data/search";
+import { PHOTOCARDS } from "@/data/photocards";
 
-describe("searchPhotocards", () => {
-  it("only returns available cards when hideOutOfStock is set", () => {
-    const result = searchPhotocards(PHOTOCARDS, { hideOutOfStock: true });
-    expect(result.every((c) => c.available)).toBe(true);
-  });
+it("only returns available cards when hideOutOfStock is set", () => {
+  const result = searchPhotocards(PHOTOCARDS, { hideOutOfStock: true });
+  expect(result.every((c) => c.available)).toBe(true);
 });
 ```
 
----
+### Writing a component test
 
-## 4. Writing a component test
-
-`@testing-library/react-native` renders components and lets you assert on what
-the user sees. Example for the shared `Button`:
+Prefer querying by **accessible role / text / label** over test IDs:
 
 ```tsx
-// src/components/__tests__/Button.test.tsx
 import { render, screen, fireEvent } from "@testing-library/react-native";
-import { Button } from "../Button";
+import { Button } from "@/components/Button";
 
 it("fires onPress when tapped", () => {
   const onPress = jest.fn();
@@ -72,57 +74,82 @@ it("fires onPress when tapped", () => {
   fireEvent.press(screen.getByText("Add to cart"));
   expect(onPress).toHaveBeenCalledTimes(1);
 });
-
-it("shows a spinner and blocks taps while loading", () => {
-  const onPress = jest.fn();
-  render(<Button title="Save" loading onPress={onPress} />);
-  fireEvent.press(screen.getByRole("button"));
-  expect(onPress).not.toHaveBeenCalled();
-});
 ```
 
-Prefer querying by **accessible role / text** (as above) over test IDs — it keeps
-tests close to real user behaviour and works across platforms.
+### Testing screens that use the store / router
 
----
-
-## 5. Testing screens that use the store
-
-Screens read from the Zustand store. Reset it between tests so state doesn't
-leak:
+`jest.setup.js` already mocks `expo-router` and `react-native-safe-area-context`.
+Reset the Zustand store between tests so state doesn't leak:
 
 ```tsx
 import { useUserStore } from "@/data/userStore";
 
 beforeEach(() => {
   useUserStore.setState({ user: null, hydrated: true });
+  useUserStore.getState().loginDemo(); // seed a demo user if needed
 });
 ```
 
-You can also seed a user directly: `useUserStore.getState().loginDemo()`.
+Assert navigation via the exposed router mock: `expect(global.__expoRouterMock.push).toHaveBeenCalledWith("/card/pc-test")`.
 
 ---
 
-## 6. Coverage
+## 2. Web end-to-end (Playwright)
+
+Drives the real app in Chromium **and** an emulated iPhone viewport. Playwright
+boots the Expo web server itself (see `webServer` in the config).
+
+```bash
+npx playwright install   # one-time: download browsers
+npm run test:e2e:web     # run the web E2E suite
+```
+
+Specs live in `e2e/web/specs/`. The smoke suite covers the core journey:
+**log in (demo) → browse/filter → open a card → add to cart → reach checkout.**
+
+Debug interactively:
+
+```bash
+npx playwright test --config e2e/web/playwright.config.ts --ui      # time-travel UI
+npx playwright test --config e2e/web/playwright.config.ts --headed  # watch it run
+```
+
+---
+
+## 3. Native end-to-end (Maestro)
+
+Runs the same journey on the **iOS simulator** and **Android emulator** using
+Maestro's simple YAML flows. Full setup in [`e2e/native/README.md`](../e2e/native/README.md).
+
+```bash
+# one-time install
+curl -fsSL "https://get.maestro.mobile.dev" | bash
+
+# with the app running on a simulator/emulator (npm run ios / android):
+npm run test:e2e:native            # run all flows
+maestro test e2e/native/flows/login.yaml   # run one flow
+```
+
+Flows target `appId: com.winkpop.app` and locate elements by visible text and
+`testID`s (`cart`, `Add to cart`) that the components expose for exactly this.
+
+---
+
+## 4. Coverage
 
 ```bash
 npm run test:coverage
 ```
 
-Opens a text summary and writes an HTML report to `coverage/lcov-report/index.html`.
-Coverage is collected from `src/**` (see `collectCoverageFrom` in
-`jest.config.js`). Aim to keep the **data layer at or near 100%** — it's pure and
-central — and cover the shared components' interaction paths.
+Writes an HTML report to `coverage/lcov-report/index.html`. Coverage is collected
+from `src/**` (see `collectCoverageFrom` in `jest.config.js`). Keep the **data
+layer at/near 100%** — it's pure and central.
 
 ---
 
-## 7. What to test next (roadmap)
+## 5. Roadmap
 
-From the PRD's "What to Test" section, the priority order is:
-
-1. **Search accuracy** — ✅ covered.
-2. **Wishlist ↔ listing matching** — add once matching logic lands.
-3. **Checkout price/terms lock** — test the cart total + buyer-fee math.
-4. **Transaction state machine** — `paid → label → shipped → delivered → released/disputed`.
-5. **Full flow (E2E)** — onboarding → search → wishlist → cart → checkout, using
-   Maestro or Playwright (web) once the backend is wired.
+As the deferred features land (trade matching, payments/shipping, community),
+add: matching-logic unit tests, a checkout/transaction state-machine test
+(`paid → label → shipped → delivered → released/disputed`), and extend the E2E
+smoke flows to cover listing creation and a full trade.

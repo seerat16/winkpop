@@ -65,7 +65,7 @@ src/data/
 ```
 
 **The rule:** screens and components import from `@/data` (the barrel), never
-from a specific mock file. The mock data *implements* the types in `types.ts`.
+from a specific mock file. The mock data _implements_ the types in `types.ts`.
 To swap in a real backend (e.g. **Supabase**, also open source):
 
 1. Keep `types.ts` as the contract.
@@ -119,14 +119,14 @@ backend exists.
 
 ## 7. Mapping to the product research
 
-| Research priority | Where it lives |
-| --- | --- |
-| Photocard-native search (#1 complaint) | `src/data/search.ts` + `app/(tabs)/browse.tsx` |
-| Zero seller fees | cart math in `app/cart.tsx` (buyer protection fee only) |
-| Price intelligence ("StockX for PCs") | `src/data/priceHistory.ts` + `app/card/[id].tsx` |
-| Collection / wishlist tracking | `app/(tabs)/wishlist.tsx` + store |
-| Trust & safety | profile ratings/badges; escrow copy in checkout |
-| Onboarding by group | `app/(auth)/onboarding.tsx` |
+| Research priority                      | Where it lives                                          |
+| -------------------------------------- | ------------------------------------------------------- |
+| Photocard-native search (#1 complaint) | `src/data/search.ts` + `app/(tabs)/browse.tsx`          |
+| Zero seller fees                       | cart math in `app/cart.tsx` (buyer protection fee only) |
+| Price intelligence ("StockX for PCs")  | `src/data/priceHistory.ts` + `app/card/[id].tsx`        |
+| Collection / wishlist tracking         | `app/(tabs)/wishlist.tsx` + store                       |
+| Trust & safety                         | profile ratings/badges; escrow copy in checkout         |
+| Onboarding by group                    | `app/(auth)/onboarding.tsx`                             |
 
 ---
 
@@ -139,4 +139,4 @@ These have clear homes when you're ready:
 - **Payments & shipping** — Stripe Connect + EasyPost, per the research doc, as a
   `src/services/` module behind the transaction store.
 - **Community (posts / stories / DMs)** — a new `(tabs)` or stacked route group,
-  sitting *on top of* the transaction core (it's supplementary per the PRD).
+  sitting _on top of_ the transaction core (it's supplementary per the PRD).

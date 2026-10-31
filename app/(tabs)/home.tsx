@@ -36,7 +36,14 @@ export default function HomeScreen() {
         <View className="mb-3 flex-row items-center justify-between">
           <Logo size={40} showWordmark={false} />
           <View className="flex-row items-center gap-4">
-            <Pressable onPress={() => router.push("/cart")} className="relative" hitSlop={8}>
+            <Pressable
+              testID="cart"
+              accessibilityRole="button"
+              accessibilityLabel="cart"
+              onPress={() => router.push("/cart")}
+              className="relative"
+              hitSlop={8}
+            >
               <ShoppingCart size={21} color={colors.muted} />
               {cartCount > 0 ? (
                 <View className="absolute -right-2 -top-2 h-4 w-4 items-center justify-center rounded-full bg-wink-pink">

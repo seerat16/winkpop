@@ -56,6 +56,7 @@ export function PhotocardTile({ card }: { card: Photocard }) {
 
         <View className="absolute right-2 top-2 flex-row gap-1">
           <Pressable
+            testID="Add to cart"
             accessibilityRole="button"
             accessibilityLabel={inCart ? "Remove from cart" : "Add to cart"}
             onPress={() => toggleCart(card.id)}

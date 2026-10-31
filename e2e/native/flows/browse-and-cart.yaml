@@ -1,0 +1,24 @@
+# Maestro flow: search/filter a card, add to cart, reach checkout.
+appId: com.winkpop.app
+---
+- launchApp:
+    clearState: true
+- tapOn: "Explore as demo collector"
+
+# Go to Browse and filter by a group.
+- tapOn: "Browse"
+- tapOn: "NewJeans"
+- assertVisible: "results"
+
+# Back to Discover and add the first card to the cart.
+- tapOn: "Discover"
+- tapOn:
+    id: "Add to cart"
+    index: 0
+
+# Open the cart and confirm the secure checkout summary.
+- tapOn:
+    id: "cart"
+- assertVisible: "Checkout securely"
+- assertVisible:
+    text: "Buyer protection.*"
