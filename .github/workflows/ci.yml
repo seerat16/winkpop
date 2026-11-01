@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Shared install logic: use the fast, cached `npm ci` when a committed
+# lockfile exists; otherwise fall back to `npm install` (which also generates
+# the lockfile). This keeps CI green whether or not package-lock.json is
+# committed yet. Once you run `npm install` locally and commit the resulting
+# package-lock.json, the `npm ci` path kicks in automatically.
+jobs:
+  # Typecheck, lint, and run the unit + component test suite.
+  test:
+    name: Typecheck · Lint · Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+
+  # Confirm the web target builds (static export).
+  build-web:
+    name: Build web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - run: npx expo export --platform web
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: dist/
+          if-no-files-found: error
+
+  # Web end-to-end tests (Playwright). Boots the Expo web server itself.
+  e2e-web:
+    name: E2E (web)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e:web
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: e2e/web/playwright-report/
+          if-no-files-found: ignore

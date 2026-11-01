@@ -1,0 +1,9 @@
+# Maestro flow: demo login lands on Discover.
+appId: com.winkpop.app
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Win the K-pop photocard experience"
+- tapOn: "Explore as demo collector"
+- assertVisible:
+    text: "Search your favorite photocards.*"
