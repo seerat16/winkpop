@@ -277,11 +277,27 @@ Xcode, in order — stop as soon as the build succeeds:
 2. Still failing? **File → Packages → Reset Package Caches**, wait, then Resolve
    Package Versions again, then Run.
 3. Still failing? **Product → Clean Build Folder** (`Shift + Cmd + K`), then Run.
-4. Last resort — clear Xcode's derived data:
+4. **Resolve from the command line** — the most reliable fix. This fetches
+   `capacitor-swift-pm` and wires up `CapApp-SPM` directly, and prints the real
+   error if something is actually wrong:
+   ```bash
+   xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App
+   ```
+   A healthy result ends with `Resolved source packages: capacitor-swift-pm …,
+CapApp-SPM … @ local`. Then go to Xcode, pick a simulator, and Run.
+5. Last resort — wipe every SPM cache, then reopen:
    ```bash
    rm -rf ~/Library/Developer/Xcode/DerivedData
+   rm -rf ~/Library/Caches/org.swift.swiftpm ~/Library/org.swift.swiftpm
+   rm -rf ios/App/.swiftpm ios/App/CapApp-SPM/.swiftpm
+   npx cap open ios
    ```
-   Reopen with `npx cap open ios` and Run.
+
+> **Is it a network problem?** SPM must reach GitHub to download
+> `capacitor-swift-pm` the first time. Test with
+> `curl -I https://github.com/ionic-team/capacitor-swift-pm.git` — a `301`/`200`
+> means GitHub is reachable (so it's a stuck cache, use steps above). A hang or
+> failure means a VPN/firewall is blocking it — disconnect the VPN and retry.
 
 **Sanity checks:**
 
