@@ -1,35 +1,24 @@
 # Dependencies
 node_modules/
 
-# Expo
-.expo/
+# Build outputs
 dist/
-web-build/
-expo-env.d.ts
+.vite/
 
-# Native
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+# Capacitor native projects (generated — not committed by default)
+# Uncomment if you want to commit the native projects:
+# ios/
+# android/
 
-# Metro
-.metro-health-check*
-
-# Testing / coverage
+# Testing
 coverage/
+playwright-report/
+test-results/
 
-# Env & secrets
+# Env
 .env
 .env.local
 .env.*.local
-
-# Logs
-npm-debug.*
-yarn-debug.*
-yarn-error.*
 
 # macOS
 .DS_Store

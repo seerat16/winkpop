@@ -1,131 +1,97 @@
 # Running WinKPop
 
-WinKPop is a single Expo (React Native) codebase that targets **Web**, **iOS**,
-and **Android**. This guide covers prerequisites and how to run each platform.
+WinKPop is a **React + Vite** web app that is wrapped as a native **iOS/Android**
+app with **Capacitor**. The same code runs in a browser and on a phone.
 
 ---
 
 ## 1. Prerequisites (all platforms)
 
-- **Node.js 18 or newer** (Node 22 LTS recommended) — <https://nodejs.org>
-- **npm** (ships with Node). pnpm/yarn also work.
-- A terminal and a code editor (VS Code recommended).
+- **Node.js 18+** (Node 20 recommended) — <https://nodejs.org>
+- **npm** (bundled with Node)
 
-Install project dependencies once:
+Install once:
 
 ```bash
+git clone https://github.com/seerat16/winkpop.git
+cd winkpop
 npm install
 ```
 
-> ℹ️ **Note on this repo:** the CI/agent sandbox that generated this project has
-> no access to the public npm registry, so `npm install` must be run on your own
-> machine (which has normal internet). All source, config, and tests are
-> complete and ready — you only need to install and run.
+---
+
+## 2. Web
+
+```bash
+npm run dev        # dev server with hot reload -> http://localhost:5173
+npm run build      # production build -> dist/
+npm run preview    # serve the production build locally -> http://localhost:4173
+```
+
+Log in with any email/password, or click **"Explore as demo collector"**.
 
 ---
 
-## 2. Web (fastest to try)
+## 3. iOS
 
-No extra tooling required beyond Node.
-
-```bash
-npm run web
-```
-
-This starts the Expo dev server and opens the app at `http://localhost:8081`
-(Metro may pick another port if 8081 is busy — watch the terminal). Hot reload is
-on by default; save a file and the browser updates.
-
-**Production web build:**
+Full walkthrough: **[`IOS_XCODE.md`](IOS_XCODE.md)**. Requires a **Mac + Xcode 26**.
 
 ```bash
-npx expo export --platform web      # outputs static site to ./dist
-npx serve dist                      # preview the static build locally
+npm install @capacitor/ios
+npx cap add ios        # one time — generates the ./ios Xcode project
+npm run ios            # build + sync + open in Xcode, then press ▶ Run
 ```
-
----
-
-## 3. iOS (macOS only)
-
-**Prerequisites**
-
-- macOS with **Xcode** (from the Mac App Store)
-- Xcode Command Line Tools: `xcode-select --install`
-- iOS Simulator (installed with Xcode)
-
-**Run in the simulator:**
-
-```bash
-npm run ios
-```
-
-**Run on a physical iPhone:** install the **Expo Go** app from the App Store,
-run `npm start`, and scan the QR code shown in the terminal with your camera.
 
 ---
 
 ## 4. Android
 
-**Prerequisites**
-
-- **Android Studio** — <https://developer.android.com/studio>
-- An Android Virtual Device (AVD) created via Android Studio's Device Manager,
-  **or** a physical device with USB debugging enabled.
-- Ensure `adb` is on your `PATH` (Android Studio installs it under
-  `~/Library/Android/sdk/platform-tools` on macOS, `%LOCALAPPDATA%\Android\Sdk\platform-tools` on Windows).
-
-**Run on an emulator / connected device:**
+Requires **Android Studio**.
 
 ```bash
-npm run android
+npm install @capacitor/android
+npx cap add android    # one time — generates the ./android project
+npm run android        # build + sync + open in Android Studio, then press ▶ Run
 ```
 
-**Run on a physical Android phone:** install **Expo Go** from the Play Store,
-run `npm start`, and scan the QR code.
+Create an emulator in Android Studio's **Device Manager**, or connect a device
+with USB debugging enabled.
 
 ---
 
-## 5. The interactive dev server
+## 5. The everyday loop (native)
+
+After editing React code in `src/`, push it into the native projects:
 
 ```bash
-npm start
+npm run build && npx cap sync      # syncs both ios and android
 ```
 
-This opens the Expo CLI. Press:
-
-| Key | Action                    |
-| --- | ------------------------- |
-| `w` | open **web**              |
-| `i` | open **iOS** simulator    |
-| `a` | open **Android** emulator |
-| `r` | reload the app            |
-| `j` | open the JS debugger      |
-| `m` | toggle the dev menu       |
+…then press **Run** in Xcode / Android Studio. Or use the one-shot scripts
+`npm run ios` / `npm run android`.
 
 ---
 
 ## 6. Environment variables
 
-The app runs fully offline against mock data, so **no env vars are required** to
-start. When you connect a real backend, create a `.env` file (already gitignored)
-and expose values with the `EXPO_PUBLIC_` prefix so they reach the client, e.g.:
-
-```bash
-EXPO_PUBLIC_SUPABASE_URL=...
-EXPO_PUBLIC_SUPABASE_ANON_KEY=...
-```
-
-Read them in code via `process.env.EXPO_PUBLIC_SUPABASE_URL`.
+The app runs fully offline against mock data — **no env vars needed** to start.
+When you add a real backend, use Vite's convention: put values in `.env`
+(gitignored) prefixed with `VITE_`, and read them via
+`import.meta.env.VITE_MY_KEY`.
 
 ---
 
-## 7. Useful scripts
+## 7. Scripts reference
 
-| Command                           | What it does                           |
-| --------------------------------- | -------------------------------------- |
-| `npm start`                       | start the dev server (pick a platform) |
-| `npm run web` / `ios` / `android` | start on a specific platform           |
-| `npm run typecheck`               | run the TypeScript compiler (no emit)  |
-| `npm run lint`                    | run ESLint                             |
-| `npm test`                        | run the Jest test suite                |
-| `npm run format`                  | format with Prettier                   |
+| Command             | What it does                       |
+| ------------------- | ---------------------------------- |
+| `npm run dev`       | Vite dev server (web)              |
+| `npm run build`     | Type-check + production web build  |
+| `npm run preview`   | Preview the production build       |
+| `npm run ios`       | Build + sync + open Xcode          |
+| `npm run android`   | Build + sync + open Android Studio |
+| `npm run typecheck` | `tsc --noEmit`                     |
+| `npm run lint`      | ESLint                             |
+| `npm test`          | Vitest unit + component tests      |
+| `npm run test:e2e`  | Playwright end-to-end tests        |
+| `npm run format`    | Prettier                           |

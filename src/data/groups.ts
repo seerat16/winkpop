@@ -1,12 +1,5 @@
 import type { Group } from "./types";
 
-/**
- * Seed catalogue of K-pop groups, members, and eras.
- *
- * This stands in for the "photocard database" described in the research docs.
- * It is intentionally a small, representative slice — enough to exercise
- * group → member → era → card-type filtering end to end.
- */
 export const GROUPS: Group[] = [
   {
     id: "newjeans",
@@ -124,5 +117,4 @@ export const GROUPS: Group[] = [
   },
 ];
 
-/** O(1) lookup map by group id. */
 export const GROUP_MAP: Record<string, Group> = Object.fromEntries(GROUPS.map((g) => [g.id, g]));

@@ -1,113 +1,82 @@
 # Debugging WinKPop
 
-How to inspect, log, and fix issues across Web, iOS, and Android.
+---
+
+## 1. Web (your main workflow)
+
+Run `npm run dev` and use your browser's DevTools:
+
+- **Console / Sources** — `console.log` and breakpoints work normally.
+- **Application → Local Storage** — inspect the persisted store under the
+  `winkpop-user` key (this is what Zustand saves).
+- **Elements** — Tailwind classes resolve to normal CSS you can toggle live.
+- **Device toolbar** (`Cmd/Ctrl + Shift + M`) — emulate an iPhone viewport,
+  which is how the app looks on device.
 
 ---
 
-## 1. The dev menu
-
-While the app is running in development, open the **dev menu**:
-
-- **Web:** it's a toolbar in the browser / press `m` in the terminal
-- **iOS simulator:** `Cmd + D`
-- **Android emulator:** `Cmd + M` (macOS) or `Ctrl + M` (Windows/Linux)
-- **Physical device:** shake the phone
-
-From here you can **Reload**, **toggle the element inspector**, enable
-**Performance monitor**, and open the **JS debugger**.
-
----
-
-## 2. Logging
-
-`console.log` / `console.warn` / `console.error` all stream to the terminal
-running the Expo dev server, and to the browser console on Web.
-
-For richer inspection, open **React Native DevTools** (Hermes): press `j` in the
-Expo CLI terminal. This gives you a Chrome-DevTools-style console, sources, and
-breakpoints that work on native and web.
-
----
-
-## 3. Inspecting state (Zustand)
-
-The user/session lives in `src/data/userStore.ts`. To watch it during
-development, log inside a component:
+## 2. Inspecting state (Zustand)
 
 ```ts
 const user = useUserStore((s) => s.user);
-console.log("current user", user);
+console.log("user", user);
+
+// one-off running trace:
+useUserStore.subscribe((s) => console.log("store →", s.user));
 ```
 
-…or subscribe once at the module level for a running trace:
-
-```ts
-useUserStore.subscribe((state) => console.log("store →", state.user));
-```
-
-Persisted state is stored under the key `winkpop-user` in AsyncStorage
-(localStorage on Web — inspect it under the browser's Application tab).
+Persisted under `winkpop-user` in localStorage. Clear it to reset:
+`localStorage.removeItem("winkpop-user")` (or Application → Clear storage).
 
 ---
 
-## 4. Inspecting layout & styles
+## 3. Debugging the iOS app's WebView (Safari)
 
-NativeWind compiles Tailwind classes to styles. To debug layout:
+The native app is a WebView, so you debug it with **desktop Safari**:
 
-- **Web:** use the browser's element inspector — classes resolve to normal CSS.
-- **Native:** open the dev menu → **Toggle Element Inspector**, then tap any
-  element to see its box model and resolved styles.
+1. On the **Mac**: Safari → Settings → Advanced → check **Show Develop menu**.
+2. In the **iOS Simulator**: Settings → Safari → Advanced → enable **Web
+   Inspector** (on a device too).
+3. Run the app from Xcode, then on the Mac open **Safari → Develop → [your
+   device/simulator] → WinKPop**. You get a full Web Inspector (console,
+   elements, network) attached to the running app.
 
-If a `className` seems ignored, confirm the file path is covered by the `content`
-globs in `tailwind.config.js` (currently `./app/**` and `./src/**`).
+Native-side logs (crashes, plugin errors) appear in **Xcode's console** at the
+bottom while the app runs.
 
 ---
 
-## 5. Common errors & fixes
+## 4. Common errors & fixes
 
-| Symptom                                 | Likely cause                                        | Fix                                                                    |
-| --------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
-| `Unable to resolve module @/...`        | Metro cache is stale after adding a file            | Restart with `npx expo start -c` (clears cache)                        |
-| Tailwind classes have no effect         | File not matched by `content` globs, or Metro cache | Check `tailwind.config.js`; restart with `-c`                          |
-| Blank white screen on launch            | A render-time throw before first paint              | Check the terminal/console for the stack trace                         |
-| `Port 8081 already in use`              | A previous dev server is still running              | Kill it, or let Expo pick another port                                 |
-| iOS build fails after dependency change | Native cache                                        | `npx expo start -c`; for bare workflow, `cd ios && pod install`        |
-| Android emulator can't reach Metro      | ADB reverse not set                                 | `adb reverse tcp:8081 tcp:8081`, then reload                           |
-| Fonts look like the system default      | Custom font not loaded                              | Fonts fall back to `System` by design until you add `expo-font` assets |
+| Symptom                          | Cause / fix                                                       |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `Failed to resolve import "@/…"` | Path alias — ensure the file exists; restart `npm run dev`        |
+| Tailwind classes do nothing      | File not matched by `content` globs in `tailwind.config.js`       |
+| Blank page in browser            | Check the DevTools console for the first thrown error             |
+| iOS app is blank                 | You synced without building — run `npm run build && npx cap sync` |
+| iOS changes not showing          | Re-run `npm run build && npx cap sync ios`                        |
+| Vite port already in use         | Stop the other server or run `npm run dev -- --port 5174`         |
 
-**Clear all caches (the "turn it off and on again"):**
+---
+
+## 5. Type errors & lint
 
 ```bash
-npx expo start -c            # clears Metro's transform cache
-rm -rf node_modules && npm install   # nuclear option for dependency weirdness
+npm run typecheck   # tsc --noEmit — catches type + route errors
+npm run lint        # eslint
 ```
+
+Run these before committing; CI runs them on every push.
 
 ---
 
-## 6. Debugging the data layer in isolation
+## 6. Debugging the pure logic
 
-The pure logic in `src/data/` (search, price history) has **no React Native
-dependencies**, so you can run and debug it with plain Node + the test runner:
-
-```bash
-npm test -- search          # run just the search tests
-npm test -- --watch         # re-run on change while you poke at logic
-```
-
-Because `searchPhotocards` and the price functions are pure, the fastest way to
-debug a filtering bug is to add a focused test case in
-`src/data/__tests__/` reproducing the input, then step through it.
-
----
-
-## 7. Type errors
-
-Run the compiler to surface type problems the editor might miss:
+The search and pricing logic in `src/data/` is pure (no React, no DOM), so the
+fastest way to debug a filtering bug is a focused Vitest case:
 
 ```bash
-npm run typecheck
+npm run test:watch -- search
 ```
 
-This catches route typos too — Expo Router generates typed routes
-(`experiments.typedRoutes` in `app.json`), so an invalid `router.push("/wrong")`
-becomes a compile error.
+Add a test reproducing the input, then step through it.

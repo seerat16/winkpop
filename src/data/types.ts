@@ -1,21 +1,5 @@
-/**
- * Core domain model for WinKPop.
- *
- * These types are the contract between the data layer and the UI. The mock
- * data layer implements them today; a Supabase (or other) backend can swap in
- * later without changing screen code, as long as it returns these shapes.
- */
-
-/** A photocard "type" — mirrors the categories in the product research docs. */
 export type CardType =
-  | "Album"
-  | "POB" // pre-order benefit
-  | "Fansign"
-  | "Broadcast"
-  | "Season's Greetings"
-  | "Collab"
-  | "MD" // official merchandise
-  | "Lucky Draw";
+  "Album" | "POB" | "Fansign" | "Broadcast" | "Season's Greetings" | "Collab" | "MD" | "Lucky Draw";
 
 export const CARD_TYPES: CardType[] = [
   "Album",
@@ -28,16 +12,12 @@ export const CARD_TYPES: CardType[] = [
   "Lucky Draw",
 ];
 
-/** Condition flag shown on listings. */
 export type Condition = "Mint" | "Near Mint" | "Good" | "Damaged";
-
-/** How a card is offered. */
 export type ListingIntent = "sale" | "trade" | "both";
 
 export interface Member {
   id: string;
   name: string;
-  /** Accent color for chips/avatars. */
   color: string;
   former?: boolean;
 }
@@ -52,11 +32,9 @@ export interface Group {
   gender: "girl" | "boy";
   color: string;
   members: Member[];
-  /** Comeback eras, newest first. */
   eras: string[];
 }
 
-/** A catalogued photocard listing in the marketplace. */
 export interface Photocard {
   id: string;
   groupId: string;
@@ -71,10 +49,8 @@ export interface Photocard {
   intent: ListingIntent;
   available: boolean;
   damaged: boolean;
-  /** Relative popularity used for the "Popular" sort. */
   popularity: number;
   sellerUsername: string;
-  /** Deterministic seed used to generate a stable placeholder image. */
   imgSeed: number;
 }
 
@@ -84,7 +60,6 @@ export interface User {
   username: string;
   displayName: string;
   bio: string;
-  /** Group ids the user currently collects. */
   collectingGroupIds: string[];
   likesIds: string[];
   cartIds: string[];
@@ -95,9 +70,8 @@ export interface User {
   verifiedSeller: boolean;
 }
 
-/** A sold-price data point powering the StockX-style price intelligence. */
 export interface PriceHistoryPoint {
-  date: string; // ISO date
+  date: string;
   price: number;
 }
 
@@ -113,5 +87,5 @@ export interface Transaction {
   counterpartyUsername: string;
   amount: number;
   status: TransactionStatus;
-  createdAt: string; // ISO date
+  createdAt: string;
 }

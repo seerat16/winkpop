@@ -4,7 +4,7 @@ export type SortKey = "popular" | "new" | "price_asc" | "price_desc";
 
 export interface SearchFilters {
   query?: string;
-  groupId?: string; // "all" or undefined = any
+  groupId?: string;
   memberId?: string;
   era?: string;
   types?: CardType[];
@@ -14,13 +14,6 @@ export interface SearchFilters {
   sort?: SortKey;
 }
 
-/**
- * The core photocard-native search. Pure function (no side effects) so it is
- * trivially unit-testable and reusable on every platform.
- *
- * Research context: "No platform filters by group + member + era + card type"
- * was the single largest qualitative complaint (26% of respondents).
- */
 export function searchPhotocards(all: Photocard[], filters: SearchFilters): Photocard[] {
   const {
     query,
@@ -33,9 +26,7 @@ export function searchPhotocards(all: Photocard[], filters: SearchFilters): Phot
     hideOutOfStock,
     sort = "popular",
   } = filters;
-
   let cards = all;
-
   if (groupId && groupId !== "all") cards = cards.filter((c) => c.groupId === groupId);
   if (memberId && memberId !== "all") cards = cards.filter((c) => c.memberId === memberId);
   if (era && era !== "all") cards = cards.filter((c) => c.era === era);
@@ -43,8 +34,7 @@ export function searchPhotocards(all: Photocard[], filters: SearchFilters): Phot
   if (hideOutOfStock) cards = cards.filter((c) => c.available);
   if (typeof minPrice === "number") cards = cards.filter((c) => c.price >= minPrice);
   if (typeof maxPrice === "number") cards = cards.filter((c) => c.price <= maxPrice);
-
-  if (query && query.trim()) {
+  if (query?.trim()) {
     const q = query.trim().toLowerCase();
     cards = cards.filter(
       (c) =>
@@ -55,21 +45,10 @@ export function searchPhotocards(all: Photocard[], filters: SearchFilters): Phot
         c.type.toLowerCase().includes(q),
     );
   }
-
   const sorted = [...cards];
-  switch (sort) {
-    case "popular":
-      sorted.sort((a, b) => b.popularity - a.popularity);
-      break;
-    case "new":
-      sorted.sort((a, b) => b.imgSeed - a.imgSeed);
-      break;
-    case "price_asc":
-      sorted.sort((a, b) => a.price - b.price);
-      break;
-    case "price_desc":
-      sorted.sort((a, b) => b.price - a.price);
-      break;
-  }
+  if (sort === "popular") sorted.sort((a, b) => b.popularity - a.popularity);
+  else if (sort === "new") sorted.sort((a, b) => b.imgSeed - a.imgSeed);
+  else if (sort === "price_asc") sorted.sort((a, b) => a.price - b.price);
+  else if (sort === "price_desc") sorted.sort((a, b) => b.price - a.price);
   return sorted;
 }

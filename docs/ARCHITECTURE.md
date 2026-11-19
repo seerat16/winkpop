@@ -1,52 +1,48 @@
 # Architecture
 
-How WinKPop is put together, and how to extend it.
+---
+
+## 1. One web codebase, three targets
+
+WinKPop is a **React + Vite** single-page app. It runs:
+
+- in any **browser** (the web product),
+- on **iOS** and **Android** via **Capacitor**, which wraps the exact same
+  compiled web bundle (`dist/`) inside a native WebView.
+
+There is no platform-specific screen code. A `PhotocardTile` written once renders
+in the browser and inside the native app identically — the "maximum component
+reuse" goal.
+
+### How Capacitor fits
+
+```
+src/ (React) ──npm run build──▶ dist/ (static web bundle)
+                                   │
+                  npx cap sync ────┼────▶ ios/      (Xcode project → iPhone)
+                                   └────▶ android/  (Gradle project → Android)
+```
+
+- `capacitor.config.ts` sets `appId` (`app.winkpop`) and `webDir` (`dist`).
+- The native projects (`ios/`, `android/`) are **generated** with `npx cap add`
+  and are gitignored by default — regenerate them on any machine.
+- Native device features (camera, haptics, status bar) are available through
+  Capacitor plugins when needed; the installed `@capacitor/*` packages cover the
+  basics.
 
 ---
 
-## 1. One codebase, three platforms
+## 2. Routing & auth gate
 
-WinKPop is an **Expo (React Native)** app. The same React component tree renders:
+`react-router-dom` with a single `<BrowserRouter>` (`src/main.tsx`). Routes are
+declared in `src/App.tsx`:
 
-- as native views on **iOS** and **Android** (via React Native)
-- as DOM on **Web** (via `react-native-web`)
+- Public: `/login`, `/onboarding`.
+- Protected: everything under `/` is wrapped in `<RequireAuth>` + `<Layout>`
+  (the bottom tab bar). `RequireAuth` redirects to `/login` when there's no user.
 
-There is **no platform-specific screen code** in the core flows — every screen in
-`app/` and every component in `src/components/` runs everywhere. This is the
-"maximum component reusability" goal: write a `PhotocardTile` once, use it on all
-three platforms.
-
-Where a true platform difference is ever needed, React Native's `Platform.select`
-or `.ios.tsx` / `.android.tsx` / `.web.tsx` file extensions handle it — but the
-current app needs none.
-
----
-
-## 2. Navigation (Expo Router)
-
-Routing is **file-based** under `app/`:
-
-```
-app/
-├── _layout.tsx         root stack + auth gate + global providers
-├── index.tsx           redirect to the auth gate
-├── (auth)/             route group: login, onboarding  (no tab bar)
-├── (tabs)/             route group with the bottom tab bar
-│   ├── _layout.tsx     defines the 5 tabs
-│   ├── home.tsx        Discover
-│   ├── browse.tsx      photocard-native search
-│   ├── wishlist.tsx    wishlist / likes / collection
-│   ├── transactions.tsx
-│   └── profile.tsx
-├── card/[id].tsx       dynamic card detail (+ price intelligence)
-├── cart.tsx
-└── settings.tsx
-```
-
-Parentheses like `(auth)` and `(tabs)` are **route groups** — they organise files
-and share a layout without adding a path segment. The root `_layout.tsx` holds
-the **auth gate**: it watches the store and redirects between the `(auth)` and
-`(tabs)` groups based on whether a user is signed in.
+The five tabs (`home`, `browse`, `wishlist`, `transactions`, `profile`) plus
+stacked routes (`card/:id`, `cart`, `settings`) all render inside `Layout`.
 
 ---
 
@@ -60,83 +56,64 @@ src/data/
 ├── search.ts         pure photocard-native search  ← core feature
 ├── priceHistory.ts   pure price-intelligence engine ← core feature
 ├── transactions.ts   seed transaction history
-├── userStore.ts      Zustand store (auth, likes, cart, wishlist, collection)
-└── index.ts          barrel — screens import from "@/data"
+└── userStore.ts      Zustand store (auth, likes, cart, wishlist, collection)
 ```
 
-**The rule:** screens and components import from `@/data` (the barrel), never
-from a specific mock file. The mock data _implements_ the types in `types.ts`.
-To swap in a real backend (e.g. **Supabase**, also open source):
+**The rule:** screens import from `@/data/*`; the mock data implements
+`types.ts`. To plug in a real backend later (e.g. Supabase, Firebase, a custom
+API):
 
 1. Keep `types.ts` as the contract.
 2. Replace the bodies of `searchPhotocards`, the catalogue getters, and the store
-   actions (`login`, `signup`, `toggleCart`, …) with API/SDK calls that return
-   the **same shapes**.
+   actions with API calls returning the **same shapes**.
 3. Screens don't change.
 
-Because `searchPhotocards`, `getPriceHistory`, and `getPriceStats` are **pure
-functions**, they're trivially unit-testable and were validated first.
+`searchPhotocards`, `getPriceHistory`, and `getPriceStats` are **pure functions**
+— trivially unit-tested, and validated first.
 
 ---
 
 ## 4. Styling & design system
 
-- **Tokens** live in `tailwind.config.js` (the `wink.*` color scale) and are
-  mirrored in `src/theme/colors.ts` for cases that need a raw color string (SVG
-  fills, gradients). Keep the two in sync.
-- Components use **NativeWind** `className` utilities.
-- The reusable primitives in `src/components/` (`Button`, `Chip`, `Screen`,
-  `Text`, `Logo`, `PhotocardImage`, `PhotocardTile`, `EmptyState`) are the design
-  system. Compose screens from these rather than restyling from scratch.
+- **Tailwind** utilities (`tailwind.config.js` defines the `wink.*` palette).
+- Shared primitives in `src/components/ui.tsx` (`Button`, `Chip`, `EmptyState`),
+  plus `Logo`, `PhotocardImage`, `PhotocardTile`, `Layout` — compose screens from
+  these.
+- `src/styles/global.css` carries the Tailwind entry **and** `safe-area-inset`
+  CSS variables so the layout respects the iPhone notch and home indicator.
 
 ### Brand
 
-The palette and logo derive from the WinKPop brand: a kawaii **winking eye** with
-a heart pupil, a rounded **"winkpop"** wordmark, and a pastel **lavender / mint /
-pink** scheme with pastel-bear mascots. `Logo.tsx` rebuilds the mark as scalable
-SVG so it's crisp on every platform.
+Kawaii pastel — a winking eye with a heart pupil, the rounded "winkpop"
+wordmark, and a lavender/mint/pink palette. `Logo.tsx` is inline SVG, crisp at
+any size.
 
 ---
 
 ## 5. State & persistence
 
-`userStore.ts` is a **Zustand** store persisted to **AsyncStorage** (which is
-`localStorage` on Web). It holds the session plus the user's likes, cart,
-wishlist, and collection. The `hydrated` flag tells the auth gate when persisted
-state has finished loading, so we don't flash the login screen on reload.
+`userStore.ts` is a **Zustand** store with the `persist` middleware writing to
+**localStorage** (key `winkpop-user`). On native this is the WebView's local
+storage, so sessions survive app restarts. It holds the session plus likes,
+cart, wishlist, and collection.
 
 ---
 
 ## 6. Photocard images
 
-We ship **no licensed card scans**. `PhotocardImage.tsx` renders a deterministic
-two-tone gradient (seeded by the group color + card seed) with the member's
-initials. This keeps the catalogue visually varied, legally clean, and fully
-offline. It's the **single swap point** for real images once an image/storage
-backend exists.
+No licensed scans ship with the app. `PhotocardImage.tsx` renders a deterministic
+two-tone gradient (seeded by group color + card seed) with the member's
+initials — varied, legally clean, offline. It's the single swap point for real
+images once a storage backend exists.
 
 ---
 
-## 7. Mapping to the product research
-
-| Research priority                      | Where it lives                                          |
-| -------------------------------------- | ------------------------------------------------------- |
-| Photocard-native search (#1 complaint) | `src/data/search.ts` + `app/(tabs)/browse.tsx`          |
-| Zero seller fees                       | cart math in `app/cart.tsx` (buyer protection fee only) |
-| Price intelligence ("StockX for PCs")  | `src/data/priceHistory.ts` + `app/card/[id].tsx`        |
-| Collection / wishlist tracking         | `app/(tabs)/wishlist.tsx` + store                       |
-| Trust & safety                         | profile ratings/badges; escrow copy in checkout         |
-| Onboarding by group                    | `app/(auth)/onboarding.tsx`                             |
-
----
-
-## 8. Roadmap seams (not yet built)
-
-These have clear homes when you're ready:
+## 7. Roadmap seams (not yet built)
 
 - **Trade matching** — a `matchTrades(wishlist, listings)` pure function beside
-  `search.ts`, surfaced on a `trades` screen.
-- **Payments & shipping** — Stripe Connect + EasyPost, per the research doc, as a
-  `src/services/` module behind the transaction store.
-- **Community (posts / stories / DMs)** — a new `(tabs)` or stacked route group,
-  sitting _on top of_ the transaction core (it's supplementary per the PRD).
+  `search.ts`, surfaced on a trades screen.
+- **Payments & shipping** — Stripe Connect + EasyPost in a `src/services/`
+  module behind the transaction store.
+- **Community (posts / stories / DMs)** — new routes layered on top of the
+  transaction core.
+- **Listing creation** — an upload form writing into the catalogue/store.

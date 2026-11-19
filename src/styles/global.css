@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Safe-area insets for iPhone notch / Dynamic Island / home-bar */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overscroll-behavior: none; /* prevents rubber-band scroll on iOS WebView */
+}
+
+/* Thin scrollbar on desktop; hidden on mobile */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #f0d8e8;
+  border-radius: 999px;
+}
