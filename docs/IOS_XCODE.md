@@ -41,7 +41,6 @@ the web app, sync it into the native project, then run it from Xcode.
 The `ios/` native project isn't committed to the repo — you generate it locally:
 
 ```bash
-npm install @capacitor/ios     # iOS platform package
 npm run build                  # compile the React app into dist/
 npx cap add ios                # creates the ./ios Xcode project + runs pod install
 ```

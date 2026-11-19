@@ -67,7 +67,7 @@ See the detailed, step-by-step guide in **[`docs/IOS_XCODE.md`](docs/IOS_XCODE.m
 Short version (requires a **Mac** + **Xcode 26**):
 
 ```bash
-npm install @capacitor/ios      # add the iOS platform package
+# @capacitor/ios is already a dependency (installed by `npm install`)
 npx cap add ios                 # generate the native Xcode project (one time)
 npm run build                   # build the web app
 npx cap sync ios                # copy the web build into the iOS project
@@ -80,7 +80,7 @@ Then in Xcode: pick a simulator (e.g. iPhone 16) and press **▶ Run**.
 ### 🤖 Android
 
 ```bash
-npm install @capacitor/android
+# @capacitor/android is already a dependency (installed by `npm install`)
 npx cap add android
 npm run android     # build + sync + open in Android Studio
 ```

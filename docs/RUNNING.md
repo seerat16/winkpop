@@ -37,7 +37,6 @@ Log in with any email/password, or click **"Explore as demo collector"**.
 Full walkthrough: **[`IOS_XCODE.md`](IOS_XCODE.md)**. Requires a **Mac + Xcode 26**.
 
 ```bash
-npm install @capacitor/ios
 npx cap add ios        # one time — generates the ./ios Xcode project
 npm run ios            # build + sync + open in Xcode, then press ▶ Run
 ```
@@ -49,7 +48,6 @@ npm run ios            # build + sync + open in Xcode, then press ▶ Run
 Requires **Android Studio**.
 
 ```bash
-npm install @capacitor/android
 npx cap add android    # one time — generates the ./android project
 npm run android        # build + sync + open in Android Studio, then press ▶ Run
 ```
