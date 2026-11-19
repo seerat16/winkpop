@@ -25,12 +25,8 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
-    "@capacitor/app": "^8.5.0",
     "@capacitor/core": "^8.5.0",
-    "@capacitor/haptics": "^8.5.0",
     "@capacitor/ios": "^8.5.0",
-    "@capacitor/keyboard": "^8.5.0",
-    "@capacitor/status-bar": "^8.5.0",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
