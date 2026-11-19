@@ -157,18 +157,19 @@ UI tests:
 
 ## 8. Common Xcode / Capacitor issues
 
-| Problem                                                        | Fix                                                                                                  |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| "deployment target 14.0 … range 15.0–27.x" (×8)                | **Warnings, not errors** — the build still runs. Fix with `npm run ios:fix`, then rebuild. See §10.  |
-| "[CP] Embed Pods Frameworks … run during every build"          | Harmless CocoaPods warning — safe to ignore.                                                         |
-| Builds but crashes at launch: "UIScene life cycle is required" | iOS 26/27 SDK needs scene adoption (Capacitor 8.5+) — upgrade & regenerate the iOS project. See §11. |
-| `npx cap add ios` fails on pods                                | `cd ios/App && pod install`                                                                          |
-| App shows a blank white screen                                 | You forgot `npm run build` before `npx cap sync` — rebuild and sync                                  |
-| Changes don't appear                                           | Re-run `npm run build && npx cap sync ios` (or use live reload §6)                                   |
-| "No account for team" / signing error                          | Signing & Capabilities → pick your Team; change bundle id if taken                                   |
-| "Unable to find a destination" / no simulator                  | Install an iOS runtime in Xcode → Settings → Components                                              |
-| CocoaPods not found                                            | `sudo gem install cocoapods` (or `brew install cocoapods`)                                           |
-| Pods out of date after dependency change                       | `cd ios/App && pod install && cd ../..`                                                              |
+| Problem                                                                           | Fix                                                                                                                                         |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| "deployment target 14.0 … range 15.0–27.x" (×8)                                   | **Warnings, not errors** — the build still runs. Fix with `npm run ios:fix`, then rebuild. See §10.                                         |
+| "[CP] Embed Pods Frameworks … run during every build"                             | Harmless CocoaPods warning — safe to ignore.                                                                                                |
+| Builds but crashes at launch: "UIScene life cycle is required"                    | iOS 26/27 SDK needs scene adoption (Capacitor 8.5+) — upgrade & regenerate the iOS project. See §11.                                        |
+| "Missing package product 'CapApp-SPM'" / "Failed to resolve package dependencies" | Capacitor 8 uses Swift Package Manager — Xcode just needs to resolve it: **File → Packages → Resolve Package Versions**, then Run. See §12. |
+| `npx cap add ios` fails on pods                                                   | `cd ios/App && pod install`                                                                                                                 |
+| App shows a blank white screen                                                    | You forgot `npm run build` before `npx cap sync` — rebuild and sync                                                                         |
+| Changes don't appear                                                              | Re-run `npm run build && npx cap sync ios` (or use live reload §6)                                                                          |
+| "No account for team" / signing error                                             | Signing & Capabilities → pick your Team; change bundle id if taken                                                                          |
+| "Unable to find a destination" / no simulator                                     | Install an iOS runtime in Xcode → Settings → Components                                                                                     |
+| CocoaPods not found                                                               | `sudo gem install cocoapods` (or `brew install cocoapods`)                                                                                  |
+| Pods out of date after dependency change                                          | `cd ios/App && pod install && cd ../..`                                                                                                     |
 
 ---
 
@@ -256,3 +257,42 @@ from the 8.5 template is the cleanest way to get the scene-enabled
 > **Safety net:** `npm run ios:fix` also injects a `UIApplicationSceneManifest`
 > into `Info.plist` if one is missing, so even a partially-migrated project will
 > launch.
+
+---
+
+## 12. "Missing package product 'CapApp-SPM'" (Swift Package Manager)
+
+Capacitor 8 uses **Swift Package Manager (SPM)** instead of CocoaPods for the iOS
+project. It generates a local package called **`CapApp-SPM`** that references all
+your native dependencies. If Xcode shows:
+
+> Failed to resolve package dependencies
+> Missing package product 'CapApp-SPM'
+
+…it just means Xcode hasn't resolved the Swift packages yet. Fix it from within
+Xcode, in order — stop as soon as the build succeeds:
+
+1. **File → Packages → Resolve Package Versions.** Wait for the status bar to
+   finish, then press **▶ Run**.
+2. Still failing? **File → Packages → Reset Package Caches**, wait, then Resolve
+   Package Versions again, then Run.
+3. Still failing? **Product → Clean Build Folder** (`Shift + Cmd + K`), then Run.
+4. Last resort — clear Xcode's derived data:
+   ```bash
+   rm -rf ~/Library/Developer/Xcode/DerivedData
+   ```
+   Reopen with `npx cap open ios` and Run.
+
+**Sanity checks:**
+
+- You should be running the project `npx cap open ios` opened — the Xcode title
+  bar reads **App**. Don't open a stray `.xcworkspace` from an old CocoaPods run;
+  if `ios/App/App.xcworkspace` exists from a previous attempt, delete the whole
+  `ios/` folder and re-run `npx cap add ios` for a clean SPM project.
+- `npx cap doctor` prints your Capacitor + platform versions and flags common
+  problems — run it if things look inconsistent.
+
+> **Note:** with Capacitor 8 + SPM there is **no Podfile**, so the
+> `npm run ios:fix` script's "pod install" / Podfile step simply no-ops. The
+> deployment-target and scene-manifest patches still apply to the Xcode project
+> and Info.plist, which is what matters.

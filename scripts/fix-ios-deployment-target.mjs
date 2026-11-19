@@ -84,6 +84,10 @@ end
     console.warn("⚠ `pod install` failed or CocoaPods not found. Run it manually:");
     console.warn("    cd ios/App && pod install");
   }
+} else {
+  // Capacitor 8 defaults to Swift Package Manager, which has no Podfile.
+  // The project.pbxproj patch above is all that's needed in that case.
+  console.log("• No Podfile found (Swift Package Manager project) — skipping pods.");
 }
 
 // 4) Ensure the Info.plist declares a UIScene manifest. iOS 26/27 SDKs refuse
