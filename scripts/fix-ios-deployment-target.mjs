@@ -86,4 +86,43 @@ end
   }
 }
 
+// 4) Ensure the Info.plist declares a UIScene manifest. iOS 26/27 SDKs refuse
+//    to launch apps that don't adopt the scene lifecycle ("UIScene life cycle
+//    is required for apps built with this SDK"). Capacitor 8.5+ templates
+//    include this; this is a safety net if an older generated plist is reused.
+const infoPlist = "ios/App/App/Info.plist";
+if (existsSync(infoPlist)) {
+  const plist = readFileSync(infoPlist, "utf8");
+  if (!plist.includes("UIApplicationSceneManifest")) {
+    const sceneBlock = `\t<key>UIApplicationSceneManifest</key>
+\t<dict>
+\t\t<key>UIApplicationSupportsMultipleScenes</key>
+\t\t<false/>
+\t\t<key>UISceneConfigurations</key>
+\t\t<dict>
+\t\t\t<key>UIWindowSceneSessionRoleApplication</key>
+\t\t\t<array>
+\t\t\t\t<dict>
+\t\t\t\t\t<key>UISceneConfigurationName</key>
+\t\t\t\t\t<string>Default Configuration</string>
+\t\t\t\t</dict>
+\t\t\t</array>
+\t\t</dict>
+\t</dict>
+`;
+    // Insert just before the closing </dict></plist>.
+    const patched = plist.replace(/\n<\/dict>\n<\/plist>/, `\n${sceneBlock}</dict>\n</plist>`);
+    if (patched !== plist) {
+      writeFileSync(infoPlist, patched);
+      console.log("✓ Added UIApplicationSceneManifest to Info.plist");
+    } else {
+      console.warn(
+        "⚠ Could not locate the </dict></plist> anchor in Info.plist — add the scene manifest manually (see docs/IOS_XCODE.md §11).",
+      );
+    }
+  } else {
+    console.log("• Info.plist already declares a scene manifest.");
+  }
+}
+
 console.log("✓ iOS deployment target fix complete.");
