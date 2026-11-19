@@ -10,14 +10,14 @@ global.__reanimatedWorkletInit = () => {};
 
 // expo-router depends on native/navigation context we don't mount in unit
 // tests. Provide lightweight mocks so components that navigate still render.
-const routerMock = {
+const mockRouter = {
   push: jest.fn(),
   replace: jest.fn(),
   back: jest.fn(),
   navigate: jest.fn(),
 };
 jest.mock("expo-router", () => ({
-  useRouter: () => routerMock,
+  useRouter: () => mockRouter,
   useLocalSearchParams: () => ({}),
   useSegments: () => [],
   Link: ({ children }) => children,
@@ -27,9 +27,14 @@ jest.mock("expo-router", () => ({
 }));
 
 // Expose the router mock so individual tests can assert on navigation.
-global.__expoRouterMock = routerMock;
+global.__expoRouterMock = mockRouter;
 
-// Safe-area context needs a provider/native module; use its built-in test mock.
-jest.mock("react-native-safe-area-context", () =>
-  require("react-native-safe-area-context/jest/mock"),
-);
+// Keep NativeWind's safe-area wrapper pointed at valid test components.
+jest.mock("react-native-safe-area-context", () => {
+  const { View } = jest.requireActual("react-native");
+  return {
+    SafeAreaProvider: ({ children }) => children,
+    SafeAreaView: ({ children }) => <View>{children}</View>,
+    useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
+  };
+});
