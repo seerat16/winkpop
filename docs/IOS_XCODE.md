@@ -157,15 +157,17 @@ UI tests:
 
 ## 8. Common Xcode / Capacitor issues
 
-| Problem                                       | Fix                                                                 |
-| --------------------------------------------- | ------------------------------------------------------------------- |
-| `npx cap add ios` fails on pods               | `cd ios/App && pod install`                                         |
-| App shows a blank white screen                | You forgot `npm run build` before `npx cap sync` — rebuild and sync |
-| Changes don't appear                          | Re-run `npm run build && npx cap sync ios` (or use live reload §6)  |
-| "No account for team" / signing error         | Signing & Capabilities → pick your Team; change bundle id if taken  |
-| "Unable to find a destination" / no simulator | Install an iOS runtime in Xcode → Settings → Components             |
-| CocoaPods not found                           | `sudo gem install cocoapods` (or `brew install cocoapods`)          |
-| Pods out of date after dependency change      | `cd ios/App && pod install && cd ../..`                             |
+| Problem                                               | Fix                                                                                                 |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| "deployment target 14.0 … range 15.0–27.x" (×8)       | **Warnings, not errors** — the build still runs. Fix with `npm run ios:fix`, then rebuild. See §10. |
+| "[CP] Embed Pods Frameworks … run during every build" | Harmless CocoaPods warning — safe to ignore.                                                        |
+| `npx cap add ios` fails on pods                       | `cd ios/App && pod install`                                                                         |
+| App shows a blank white screen                        | You forgot `npm run build` before `npx cap sync` — rebuild and sync                                 |
+| Changes don't appear                                  | Re-run `npm run build && npx cap sync ios` (or use live reload §6)                                  |
+| "No account for team" / signing error                 | Signing & Capabilities → pick your Team; change bundle id if taken                                  |
+| "Unable to find a destination" / no simulator         | Install an iOS runtime in Xcode → Settings → Components                                             |
+| CocoaPods not found                                   | `sudo gem install cocoapods` (or `brew install cocoapods`)                                          |
+| Pods out of date after dependency change              | `cd ios/App && pod install && cd ../..`                                                             |
 
 ---
 
@@ -178,3 +180,36 @@ npm run build && npx cap sync ios   # push changes into the native project
 ```
 
 That's it — you're testing the real iOS app built from your React codebase.
+
+---
+
+## 10. Fixing the iOS deployment-target warnings
+
+After `npx cap add ios`, Xcode 26/27 shows a batch of warnings like:
+
+> The iOS Simulator deployment target 'IPHONEOS_DEPLOYMENT_TARGET' is set to
+> 14.0, but the range of supported deployment target versions is 15.0 to 27.x.
+
+**These are warnings, not errors** — the app still builds and runs. They happen
+because Capacitor 7's template defaults pods and the app target to iOS 14.0,
+while recent Xcode only supports 15.0+.
+
+**Fix (one command):**
+
+```bash
+npm run ios:fix
+```
+
+This runs `scripts/fix-ios-deployment-target.mjs`, which:
+
+1. Bumps `IPHONEOS_DEPLOYMENT_TARGET` to **15.1** in the app's Xcode project, and
+2. Adds a Podfile `post_install` hook pinning every pod to 15.1, then runs
+   `pod install`.
+
+It's idempotent and already wired into `npm run ios`, so after the first
+`npx cap add ios` the normal flow keeps it fixed automatically. In Xcode, press
+**▶ Run** again and the warnings are gone.
+
+> Prefer to do it by hand? In Xcode: select the **App** project → each target →
+> **Build Settings** → set **iOS Deployment Target** to **15.1**, and do the same
+> for the **Pods** project. The script just automates this.
