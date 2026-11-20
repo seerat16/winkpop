@@ -28,19 +28,32 @@ Routing is **file-based** under `app/`:
 
 ```
 app/
-├── _layout.tsx         root stack + auth gate + global providers
-├── index.tsx           redirect to the auth gate
-├── (auth)/             route group: login, onboarding  (no tab bar)
-├── (tabs)/             route group with the bottom tab bar
-│   ├── _layout.tsx     defines the 5 tabs
-│   ├── home.tsx        Discover
-│   ├── browse.tsx      photocard-native search
-│   ├── wishlist.tsx    wishlist / likes / collection
-│   ├── transactions.tsx
-│   └── profile.tsx
-├── card/[id].tsx       dynamic card detail (+ price intelligence)
-├── cart.tsx
-└── settings.tsx
+├── _layout.tsx           root stack + auth gate + global providers + cart expiry
+├── index.tsx             redirect to the auth gate
+├── (auth)/               login, forgot, instagram connect, 5-step onboarding (no tab bar)
+├── (tabs)/               bottom tab bar: Discover · Transactions · + · Messages · Profile
+│   ├── _layout.tsx       tabs + the "What would you like to upload?" sheet
+│   ├── home.tsx          Discover (stories, feeds, 1–3 per row, domestic/global)
+│   ├── transactions.tsx  Buying · Selling · Trading · Tracking
+│   ├── upload.tsx        placeholder for the + tab
+│   ├── messages.tsx      inbox, filters, folders, requests
+│   ├── profile.tsx       your profile
+│   ├── browse.tsx        (hidden tab) photocard-native search + Groups directory
+│   └── wishlist.tsx      (hidden tab) legacy "My Cards"
+├── card/[id].tsx         listing page (+ price intelligence, offers, trade, comments)
+├── catalog/[id].tsx      photocard database entry
+├── database.tsx          database browser · scan · contribute
+├── group/[id].tsx        group page
+├── listing/new.tsx       create / edit / bulk list
+├── post/new.tsx, post/[id].tsx
+├── story/new.tsx, story/[username].tsx, highlights.tsx
+├── chat/[id].tsx, chat/new.tsx, share.tsx
+├── cart.tsx, buy/[id].tsx, likes.tsx, saves.tsx, saved-folders.tsx, hub.tsx
+├── trade/new.tsx, tracking/index.tsx, tracking/[id].tsx, review/[orderId].tsx
+├── user/[username].tsx, follows/[username].tsx, reviews/[username].tsx
+├── collection.tsx, wishlists/{index,new,[id]}.tsx, edit-collecting.tsx
+├── edit-profile.tsx, settings/{index,shipping,payments,notifications,blocked}.tsx
+└── notifications.tsx, safety.tsx, tutorial.tsx, community.tsx, group-orders.tsx
 ```
 
 Parentheses like `(auth)` and `(tabs)` are **route groups** — they organise files
@@ -55,12 +68,17 @@ the **auth gate**: it watches the store and redirects between the `(auth)` and
 ```
 src/data/
 ├── types.ts          domain model (the contract)
-├── groups.ts         seed catalogue: groups → members → eras
+├── groups.ts         seed catalogue: groups → members (incl. former) → eras
 ├── photocards.ts     deterministic marketplace catalogue
+├── catalog.ts        photocard DATABASE: standardized names, categories, versions, stores ← core
 ├── search.ts         pure photocard-native search  ← core feature
 ├── priceHistory.ts   pure price-intelligence engine ← core feature
+├── commerce.ts       pure rules: fees, cart/bundles/coupons, shipping, validation, matching
+├── community.ts      seed collectors, reviews, badges, three-strikes
+├── seed.ts           seed posts, stories, chats, offers, trades, orders, wishlists, GOs
 ├── transactions.ts   seed transaction history
-├── userStore.ts      Zustand store (auth, likes, cart, wishlist, collection)
+├── userStore.ts      Zustand store: session, profile, prefs, social graph, collection, wallet
+├── appStore.ts       Zustand store: listings, posts, stories, chats, offers, trades, orders…
 └── index.ts          barrel — screens import from "@/data"
 ```
 
