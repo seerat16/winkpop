@@ -19,6 +19,12 @@ single purpose-built app, with the features collectors actually asked for:
 - 💜 **Collection & wishlist tracking** — wishlist / likes / collection in one place
 - 🔁 **Buy, sell & trade** — with escrow-style payment holding
 - 🛡️ **Trust & safety** — seller ratings, verification badges, buyer protection
+- 🗂️ **Photocard database** — standardized names, album / POB / MD trees, scan & contribute for points
+- 💬 **Community** — posts, stories & heart-shaped highlights, DMs & group chats, follows, comments
+- 📦 **Shipping & tracking** — four priced shipping options, labels, step-by-step tracking, reviews
+- 🤝 **Group orders** — claim cards before paying, GOM hosting
+
+See [`docs/FEATURES.md`](docs/FEATURES.md) for a section-by-section map of the product spec.
 
 > Primary target user: the **1–3 year collector** (highest spend, highest app-usefulness rating in primary research).
 
@@ -41,7 +47,7 @@ in later — screens never import mock data directly, only the `@/data` barrel.
 
 WinKPop is **one Expo codebase** that runs on Web, iOS, and Android. Pick the
 platform you want below. More detail (env vars, production builds) lives in
-[`docs/RUNNING.md`](docs/RUNNING.md); troubleshooting is in
+[`docs/RUNNING.md`](docs/RUNNING.md); feature coverage in [`docs/FEATURES.md`](docs/FEATURES.md); troubleshooting is in
 [`docs/DEBUGGING.md`](docs/DEBUGGING.md).
 
 ### 0. Get the code & install dependencies (do this once, all platforms)

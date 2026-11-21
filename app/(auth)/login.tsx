@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, TextInput, View, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
-import { Eye, EyeOff, Mail, Lock, Sparkles } from "lucide-react-native";
+import { Eye, EyeOff, Instagram, Mail, Lock, Sparkles } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Logo, Text } from "@/components";
 import { useUserStore } from "@/data/userStore";
@@ -12,6 +12,7 @@ export default function LoginScreen() {
   const login = useUserStore((s) => s.login);
   const signup = useUserStore((s) => s.signup);
   const loginDemo = useUserStore((s) => s.loginDemo);
+  const loginWithProvider = useUserStore((s) => s.loginWithProvider);
 
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
@@ -25,6 +26,10 @@ export default function LoginScreen() {
     setError("");
     if (!email.trim() || !password) {
       setError("Please enter your email and password.");
+      return;
+    }
+    if (mode === "signup" && password.length < 8) {
+      setError("Passwords need at least 8 characters.");
       return;
     }
     const result = mode === "login" ? login(email, password) : signup(email, password);
@@ -192,6 +197,16 @@ export default function LoginScreen() {
                 </View>
               </View>
 
+              {mode === "login" ? (
+                <Pressable
+                  accessibilityRole="link"
+                  onPress={() => router.push("/(auth)/forgot")}
+                  className="-mt-2 self-end"
+                >
+                  <Text className="text-xs text-wink-pink">Forgot password?</Text>
+                </Pressable>
+              ) : null}
+
               {/* Error */}
               {error ? (
                 <View className="rounded-card border border-wink-pink-border bg-wink-pink-tint px-4 py-3">
@@ -227,6 +242,31 @@ export default function LoginScreen() {
                 Explore as demo collector
               </Text>
             </Pressable>
+
+            {/* Social sign-in (§1P, §1R) */}
+            <View className="mt-3 flex-row gap-3">
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  loginWithProvider("google");
+                  router.replace("/(tabs)/home");
+                }}
+                className="flex-1 flex-row items-center justify-center gap-2 rounded-card border border-wink-pink-border bg-white py-3"
+              >
+                <Text className="font-display text-sm" style={{ color: "#4285F4" }}>
+                  G
+                </Text>
+                <Text className="text-sm text-wink-ink">Google</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push("/(auth)/instagram")}
+                className="flex-1 flex-row items-center justify-center gap-2 rounded-card border border-wink-pink-border bg-white py-3"
+              >
+                <Instagram size={16} color={colors.pink} />
+                <Text className="text-sm text-wink-ink">Instagram</Text>
+              </Pressable>
+            </View>
           </View>
 
           {/* Bottom hint */}

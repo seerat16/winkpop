@@ -1,7 +1,7 @@
 import { Pressable, View } from "react-native";
-import { Heart, ShoppingCart } from "lucide-react-native";
+import { Heart, Layers, ShoppingCart } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import type { Photocard } from "@/data/types";
+import type { Photocard, UserListing } from "@/data/types";
 import { useUserStore } from "@/data/userStore";
 import { colors } from "@/theme/colors";
 import { PhotocardImage } from "./PhotocardImage";
@@ -11,7 +11,12 @@ import { Text } from "./Text";
  * A single photocard card in a grid. Reused by Home, Browse, Wishlist, Likes,
  * and group detail — the most-reused content component in the app.
  */
-export function PhotocardTile({ card }: { card: Photocard }) {
+/** WTS / WTT / WTT·WTS label for a listing's intent (§7O). */
+export function intentLabel(intent: Photocard["intent"]): string {
+  return intent === "sale" ? "WTS" : intent === "trade" ? "WTT" : "WTT/WTS";
+}
+
+export function PhotocardTile({ card, compact = false }: { card: Photocard; compact?: boolean }) {
   const router = useRouter();
   const user = useUserStore((s) => s.user);
   const toggleLike = useUserStore((s) => s.toggleLike);
@@ -19,6 +24,9 @@ export function PhotocardTile({ card }: { card: Photocard }) {
 
   const liked = user?.likesIds.includes(card.id) ?? false;
   const inCart = user?.cartIds.includes(card.id) ?? false;
+  const slides = (card as Partial<UserListing>).slides?.length ?? 0;
+  const status = (card as Partial<UserListing>).status;
+  const promoted = (card as Partial<UserListing>).promoted;
 
   return (
     <Pressable
@@ -48,11 +56,28 @@ export function PhotocardTile({ card }: { card: Photocard }) {
             </Text>
           </View>
         )}
-        <View className="absolute left-2 bottom-2 rounded bg-white/85 px-2 py-0.5">
-          <Text className="text-wink-ink" style={{ fontSize: 10 }}>
-            {card.type}
-          </Text>
+        <View className="absolute bottom-2 left-2 flex-row gap-1">
+          <View className="rounded bg-white/85 px-2 py-0.5">
+            <Text className="text-wink-ink" style={{ fontSize: 10 }}>
+              {compact ? intentLabel(card.intent) : `${card.type} · ${intentLabel(card.intent)}`}
+            </Text>
+          </View>
+          {slides > 1 ? (
+            <View className="flex-row items-center gap-0.5 rounded bg-black/50 px-1.5 py-0.5">
+              <Layers size={9} color={colors.white} />
+              <Text className="text-white" style={{ fontSize: 9 }}>
+                {slides}
+              </Text>
+            </View>
+          ) : null}
         </View>
+        {status === "hold" || promoted ? (
+          <View className="absolute bottom-2 right-2 rounded bg-wink-purple px-1.5 py-0.5">
+            <Text className="font-display text-white" style={{ fontSize: 8 }}>
+              {status === "hold" ? "ON HOLD" : "PROMOTED"}
+            </Text>
+          </View>
+        ) : null}
 
         <View className="absolute right-2 top-2 flex-row gap-1">
           <Pressable
@@ -82,7 +107,7 @@ export function PhotocardTile({ card }: { card: Photocard }) {
         </View>
       </View>
 
-      <View className="p-2.5">
+      <View className={compact ? "p-1.5" : "p-2.5"}>
         <Text className="font-display text-wink-pink" style={{ fontSize: 11 }}>
           {card.memberName}
         </Text>
