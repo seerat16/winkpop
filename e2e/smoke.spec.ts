@@ -21,7 +21,7 @@ test.describe("WinKPop smoke", () => {
     await page.goto("/");
     await page.getByRole("button", { name: "Explore as demo collector" }).click();
     await page.getByLabel("Add to cart").first().click();
-    await page.getByRole("button", { name: "Cart" }).click();
+    await page.getByRole("button", { name: "Cart", exact: true }).click();
     await expect(page.getByRole("button", { name: "Checkout securely" })).toBeVisible();
     await expect(page.getByText(/Buyer protection/)).toBeVisible();
   });
