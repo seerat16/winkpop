@@ -10,18 +10,22 @@ export function PhotocardImage({
   memberName,
   imgSeed,
   className = "",
+  aspectRatio = 3 / 4,
+  rounded = true,
 }: {
   groupId: string;
   memberName: string;
   imgSeed: number;
   className?: string;
+  aspectRatio?: number;
+  rounded?: boolean;
 }) {
   const base = GROUP_MAP[groupId]?.color ?? "#C9A8E0";
   const tint = shiftColor(base, (imgSeed % 7) * 12 - 24);
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden ${className}`}
-      style={{ background: `linear-gradient(135deg, ${base}, ${tint})`, aspectRatio: "3 / 4" }}
+      className={`relative flex w-full items-center justify-center overflow-hidden ${rounded ? "rounded-card" : ""} ${className}`}
+      style={{ background: `linear-gradient(135deg, ${base}, ${tint})`, aspectRatio }}
     >
       <span className="font-display text-3xl font-extrabold text-white/90">
         {initials(memberName)}
@@ -31,7 +35,7 @@ export function PhotocardImage({
 }
 
 function initials(name: string) {
-  return name
+  return (name || "")
     .split(/\s+/)
     .map((p) => p[0])
     .join("")

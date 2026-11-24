@@ -89,6 +89,12 @@ Then in Android Studio press **▶ Run** on an emulator or connected device.
 
 ---
 
+## Payments (optional)
+
+The app runs fully in **demo mode** out of the box. To take real payments with
+Stripe Connect, set up the Supabase backend in [`supabase/`](supabase) and copy
+`.env.example` to `.env.local` — see [`docs/PAYMENTS.md`](docs/PAYMENTS.md).
+
 ## Testing
 
 ```bash
@@ -109,11 +115,14 @@ winkpop/
 ├── src/
 │   ├── main.tsx              # React entry (mounts BrowserRouter)
 │   ├── App.tsx               # routes + auth gate
-│   ├── components/           # shared UI: Layout, Logo, PhotocardTile, ui.tsx
-│   ├── screens/              # Login, Onboarding, Home, Browse, Wishlist, …
-│   ├── data/                 # types + mock data + pure logic (search, pricing)
+│   ├── components/           # shared UI: Layout (tab bar + upload sheet), primitives, PhotocardTile…
+│   ├── screens/              # ~55 screens: Discover, Browse, listings, cart, trading, chat, profile…
+│   ├── rn/                   # tiny RN-style primitives (View/Text/Pressable…) rendered as DOM
+│   ├── lib/                  # backend (Supabase), payments (Stripe), invites, formatting
+│   ├── data/                 # types, photocard database, stores, pure business rules
 │   ├── test/                 # Vitest setup + render helper
 │   └── styles/global.css     # Tailwind entry + safe-area CSS
+├── supabase/                 # payments backend: SQL schema with RLS + Stripe Edge Functions
 ├── e2e/                      # Playwright specs
 ├── docs/                     # RUNNING · IOS_XCODE · DEBUGGING · TESTING · ARCHITECTURE
 └── .github/workflows/ci.yml  # typecheck · lint · test · build · e2e
@@ -128,6 +137,8 @@ winkpop/
 | [`docs/DEBUGGING.md`](docs/DEBUGGING.md)       | DevTools, logs, common errors & fixes              |
 | [`docs/TESTING.md`](docs/TESTING.md)           | Unit, component & E2E testing                      |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Data layer, backend seam, how Capacitor fits       |
+| [`docs/FEATURES.md`](docs/FEATURES.md)         | Every spec section → what's built / simulated      |
+| [`docs/PAYMENTS.md`](docs/PAYMENTS.md)         | Supabase + Stripe Connect setup & security         |
 
 ## License
 

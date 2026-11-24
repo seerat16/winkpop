@@ -26,3 +26,11 @@ body,
   background: #f0d8e8;
   border-radius: 999px;
 }
+
+/* Horizontal chip / card rows scroll without a visible bar */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

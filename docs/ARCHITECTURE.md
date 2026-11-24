@@ -117,3 +117,21 @@ images once a storage backend exists.
 - **Community (posts / stories / DMs)** — new routes layered on top of the
   transaction core.
 - **Listing creation** — an upload form writing into the catalogue/store.
+
+## Screens, `src/rn` and payments (added with the full feature set)
+
+- **`src/screens/*`**: about 55 feature screens (Discover, Browse, listing pages,
+  cart and checkout, trading, tracking, messages, posts, stories, profiles,
+  collection, wishlists, database, settings…). Routes live in `src/App.tsx`. Tab
+  screens render inside `components/Layout.tsx` (Discover · Transactions · + ·
+  Messages · Profile). Every other screen is full-screen.
+- **`src/rn/*`**: the feature screens were first written against React Native's
+  primitives. `src/rn` renders `View`, `Text`, `Pressable`, `ScrollView`,
+  `TextInput` and `Modal` as plain DOM with Tailwind, and `src/rn/router` maps
+  `router.push("/(tabs)/home")`-style navigation onto react-router. New screens
+  can use either these primitives or plain JSX.
+- **`src/data/*`**: domain types, the photocard database (`catalog.ts`), pure
+  business rules (`commerce.ts`, `community.ts`) and two persisted zustand
+  stores (`userStore`, `appStore`).
+- **`src/lib/*` + `supabase/*`**: the payments backend. With no env vars, the app
+  is in demo mode and nothing leaves the device. See `docs/PAYMENTS.md`.
