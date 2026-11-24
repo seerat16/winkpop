@@ -5,8 +5,8 @@ appId: com.winkpop.app
     clearState: true
 - tapOn: "Explore as demo collector"
 
-# Go to Browse and filter by a group.
-- tapOn: "Browse"
+# Go to Browse (via the Discover search entry) and filter by a group.
+- tapOn: "Search your favorite photocards…"
 - tapOn: "NewJeans"
 - assertVisible: "results"
 

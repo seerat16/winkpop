@@ -3,7 +3,7 @@ appId: com.winkpop.app
 ---
 - launchApp:
     clearState: true
-- assertVisible: "Win the K-pop photocard experience"
+- assertVisible: "Your photocard universe, all in one place"
 - tapOn: "Explore as demo collector"
 - assertVisible:
     text: "Search your favorite photocards.*"

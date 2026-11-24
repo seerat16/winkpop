@@ -2,7 +2,7 @@ import { searchPhotocards } from "../search";
 import type { Photocard } from "../types";
 
 function card(overrides: Partial<Photocard>): Photocard {
-  return {
+  const base: Photocard = {
     id: "pc-x",
     groupId: "newjeans",
     groupName: "NewJeans",
@@ -21,6 +21,8 @@ function card(overrides: Partial<Photocard>): Photocard {
     imgSeed: 1,
     ...overrides,
   };
+  // Keep the title consistent with the card's member / era / type.
+  return { ...base, title: overrides.title ?? `${base.memberName} ${base.era} ${base.type}` };
 }
 
 const DATA: Photocard[] = [
