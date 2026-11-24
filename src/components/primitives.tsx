@@ -47,7 +47,7 @@ export function Page({
       {scroll ? (
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+          contentContainerStyle={{ paddingLeft: 16, paddingRight: 16, paddingBottom: 40 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -165,7 +165,7 @@ export function Field({ label, error, hint, counter, ...props }: FieldProps) {
       <TextInput
         placeholderTextColor={colors.muted}
         className="rounded-card border bg-white px-4 py-3 text-wink-ink"
-        style={{ borderColor: error ? colors.pink : colors.pinkBorder, minHeight: props.multiline ? 80 : undefined, textAlignVertical: props.multiline ? "top" : "auto" }}
+        style={{ borderColor: error ? colors.pink : colors.pinkBorder, minHeight: props.multiline ? 80 : undefined }}
         {...props}
       />
       {error ? <Text className="mt-1 text-xs text-wink-pink">{error}</Text> : null}

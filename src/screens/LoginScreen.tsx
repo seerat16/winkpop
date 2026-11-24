@@ -122,13 +122,7 @@ export default function LoginScreen() {
           {/* Main card */}
           <View
             className="mx-4 rounded-card bg-white px-6 pt-6 pb-8"
-            style={{
-              shadowColor: colors.purpleSoft,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.18,
-              shadowRadius: 24,
-              elevation: 8,
-            }}
+            style={{ boxShadow: "0 8px 24px rgba(201, 168, 224, 0.18)" }}
           >
             {/* Mode toggle — pill style */}
             <View className="mb-6 flex-row rounded-pill bg-wink-purple-tint p-1">
@@ -142,17 +136,7 @@ export default function LoginScreen() {
                   className={`flex-1 items-center rounded-pill py-2.5 ${
                     mode === tab ? "bg-wink-pink" : ""
                   }`}
-                  style={
-                    mode === tab
-                      ? {
-                          shadowColor: colors.pink,
-                          shadowOffset: { width: 0, height: 4 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 8,
-                          elevation: 4,
-                        }
-                      : {}
-                  }
+                  style={mode === tab ? { boxShadow: "0 4px 8px rgba(212, 117, 154, 0.3)" } : undefined}
                 >
                   <Text
                     className={`text-sm font-display ${
