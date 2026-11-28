@@ -1,0 +1,30 @@
+# TEMPORARY — regenerates package-lock.json with @typescript-eslint/parser and
+# reports lint + unit test results. Deleted right after use.
+name: tmp-lockfile
+on:
+  push:
+    branches: [tmp/lockfile-update]
+permissions:
+  contents: read
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm install --save-dev @typescript-eslint/parser@^8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lockfile
+          path: |
+            package.json
+            package-lock.json
+      - name: Lint
+        continue-on-error: true
+        run: npx eslint src --ext .ts,.tsx --max-warnings 0 -f unix
+      - name: Unit tests
+        continue-on-error: true
+        run: npx vitest run --reporter=verbose
