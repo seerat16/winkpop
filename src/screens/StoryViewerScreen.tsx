@@ -1,4 +1,5 @@
-import { Pressable, SafeAreaView, Share, TextInput, View } from "@/rn";
+import { Pressable, SafeAreaView, TextInput, View } from "@/rn";
+import { Share } from "@/rn/platform";
 import { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "@/rn/router";
 import { Eye, Heart, MoreHorizontal, Send, X } from "lucide-react";

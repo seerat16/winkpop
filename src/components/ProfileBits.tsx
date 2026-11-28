@@ -1,4 +1,5 @@
-import { Linking, Pressable, ScrollView, View } from "@/rn";
+import { Pressable, ScrollView, View } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useRouter } from "@/rn/router";
 import { Plus } from "lucide-react";
 import type { Badge, Highlight } from "@/data";

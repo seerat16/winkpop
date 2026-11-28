@@ -1,4 +1,5 @@
-import { Linking, Pressable, SafeAreaView, ScrollView, View } from "@/rn";
+import { Pressable, SafeAreaView, ScrollView, View } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useMemo, useState } from "react";
 import { useRouter } from "@/rn/router";
 import { Camera, Check, ChevronLeft } from "lucide-react";

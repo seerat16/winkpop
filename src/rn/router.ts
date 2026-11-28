@@ -5,7 +5,7 @@
  * `router.back()` and read params with `useLocalSearchParams()`. Expo route
  * groups like "/(tabs)/home" are normalised to "/home".
  */
-import { useMemo } from "react";
+import { createElement, useMemo } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { normalizeHref } from "./href";
 
@@ -38,5 +38,5 @@ export function useLocalSearchParams<T extends Record<string, string | undefined
 }
 
 export function Redirect({ href }: { href: string }) {
-  return <Navigate to={normalizeHref(href)} replace />;
+  return createElement(Navigate, { to: normalizeHref(href), replace: true });
 }

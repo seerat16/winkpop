@@ -3,7 +3,8 @@ import { Copy, Mail, MessageSquare, Share2 } from "lucide-react";
 import { Button, Card, Notice, Page, SectionTitle, Text, UserRow } from "@/components";
 import { COMMUNITY_USERS } from "@/data";
 import { useUserStore } from "@/data/userStore";
-import { Share, View } from "@/rn";
+import { View } from "@/rn";
+import { Share } from "@/rn/platform";
 import { colors } from "@/theme/colors";
 import { INVITE_POINTS, inviteCode, inviteLink } from "@/lib/invites";
 

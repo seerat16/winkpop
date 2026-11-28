@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Linking, Pressable, TextInput, View } from "@/rn";
+import { Pressable, TextInput, View } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useRouter } from "@/rn/router";
 import { Heart, Layers, Link2, Plus, Search } from "lucide-react";
 import type { Photocard, Post } from "@/data";

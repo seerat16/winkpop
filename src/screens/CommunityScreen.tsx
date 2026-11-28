@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Linking, Pressable, ScrollView, View } from "@/rn";
+import { Pressable, ScrollView, View } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useLocalSearchParams } from "@/rn/router";
 import { Button, Chip, EmptyState, Page, PostCard, Tabs, Text, UserRow } from "@/components";
 import { COMMUNITY_USERS, DISCORD_URL, GROUPS, getCommunityUser } from "@/data";

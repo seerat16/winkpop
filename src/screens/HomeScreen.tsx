@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Linking, Pressable, ScrollView, View } from "@/rn";
+import { Pressable, ScrollView, View } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useRouter } from "@/rn/router";
 import { Bell, Columns2, Columns3, Database, Heart, Rows3, Search, ShoppingCart, Users } from "lucide-react";
 import {

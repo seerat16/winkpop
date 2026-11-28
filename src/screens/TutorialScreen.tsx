@@ -1,4 +1,4 @@
-import { Linking } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useLocalSearchParams, useRouter } from "@/rn/router";
 import { Button, Card, Page, SectionTitle, Text } from "@/components";
 import { GLOSSARY, PACKING_GUIDE, SUPPLIES_BUNDLE_URL, TRADING_TUTORIAL } from "@/data";

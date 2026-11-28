@@ -54,8 +54,9 @@ export default function CollectionScreen() {
   const [albumSheet, setAlbumSheet] = useState(false);
   const [notice, setNotice] = useState("");
 
-  const ids = user?.collectionIds ?? [];
-  const qty = user?.collectionQty ?? {};
+  // Memoised so the empty fallbacks don't change identity on every render.
+  const ids = useMemo(() => user?.collectionIds ?? [], [user?.collectionIds]);
+  const qty = useMemo(() => user?.collectionQty ?? {}, [user?.collectionQty]);
   const stats = useMemo(() => collectionStats(ids, qty, user?.collectionCost), [ids, qty, user?.collectionCost]);
   const trend = useMemo(() => collectionValueTrend(ids, qty), [ids, qty]);
   const cards = ids.map(getPhotocard).filter((c): c is Photocard => Boolean(c));

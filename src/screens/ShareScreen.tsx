@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Share, TextInput, View } from "@/rn";
+import { TextInput, View } from "@/rn";
+import { Share } from "@/rn/platform";
 import { useLocalSearchParams, useRouter } from "@/rn/router";
 import { Search } from "lucide-react";
 import { Button, Notice, Page, UserRow } from "@/components";

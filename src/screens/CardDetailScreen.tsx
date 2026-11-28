@@ -1,4 +1,5 @@
-import { Dimensions, Pressable, SafeAreaView, ScrollView, Share, View } from "@/rn";
+import { Pressable, SafeAreaView, ScrollView, View } from "@/rn";
+import { Dimensions, Share } from "@/rn/platform";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "@/rn/router";
 import {

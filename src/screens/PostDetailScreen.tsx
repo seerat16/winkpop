@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Linking, Pressable, TextInput, View } from "@/rn";
+import { Pressable, TextInput, View } from "@/rn";
+import { Linking } from "@/rn/platform";
 import { useLocalSearchParams, useRouter } from "@/rn/router";
 import { Heart, MoreHorizontal, Pin, Send, Trash2 } from "lucide-react";
 import {
