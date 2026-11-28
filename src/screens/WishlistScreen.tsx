@@ -1,11 +1,16 @@
 import { useMemo, useState } from "react";
-import { PhotocardTile } from "@/components/PhotocardTile";
-import { Chip, EmptyState } from "@/components/ui";
+import { View } from "@/rn";
+import { Chip, EmptyState, PhotocardTile, Screen, Text } from "@/components";
 import { getPhotocard } from "@/data/photocards";
 import { useUserStore } from "@/data/userStore";
 
 type Tab = "wishlist" | "likes" | "collection";
 
+/**
+ * Collection & wishlist management (MVP: wishlist/saving stage). Three sub-tabs
+ * separate the distinct actions the research called out — wishlist (want),
+ * likes (saved/liked), and collection (have).
+ */
 export default function WishlistScreen() {
   const user = useUserStore((s) => s.user);
   const [tab, setTab] = useState<Tab>("wishlist");
@@ -32,27 +37,31 @@ export default function WishlistScreen() {
   };
 
   return (
-    <div className="px-4 pt-2">
-      <h1 className="mb-4 font-display text-2xl font-extrabold text-wink-ink">My Cards</h1>
-      <div className="mb-4 flex gap-2">
-        <Chip label="Wishlist" active={tab === "wishlist"} onClick={() => setTab("wishlist")} />
-        <Chip label="Likes" active={tab === "likes"} onClick={() => setTab("likes")} />
-        <Chip
-          label="Collection"
-          active={tab === "collection"}
-          onClick={() => setTab("collection")}
-        />
-      </div>
+    <Screen padded={false}>
+      <View className="px-4 pt-2">
+        <Text className="mb-4 font-display text-2xl text-wink-ink">My Cards</Text>
+        <View className="mb-4 flex-row gap-2">
+          <Chip label="Wishlist" active={tab === "wishlist"} onPress={() => setTab("wishlist")} />
+          <Chip label="Likes" active={tab === "likes"} onPress={() => setTab("likes")} />
+          <Chip
+            label="Collection"
+            active={tab === "collection"}
+            onPress={() => setTab("collection")}
+          />
+        </View>
 
-      {cards.length === 0 ? (
-        <EmptyState emoji="💜" title={copy[tab].empty} subtitle={copy[tab].sub} />
-      ) : (
-        <div className="grid grid-cols-2 gap-3">
-          {cards.map((card) => (
-            <PhotocardTile key={card.id} card={card} />
-          ))}
-        </div>
-      )}
-    </div>
+        {cards.length === 0 ? (
+          <EmptyState emoji="💜" title={copy[tab].empty} subtitle={copy[tab].sub} />
+        ) : (
+          <View className="flex-row flex-wrap justify-between">
+            {cards.map((card) => (
+              <View key={card.id} className="mb-3 w-[48.5%]">
+                <PhotocardTile card={card} />
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </Screen>
   );
 }

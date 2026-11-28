@@ -1,6 +1,11 @@
 import { PHOTOCARDS } from "./photocards";
 import type { Transaction } from "./types";
 
+/**
+ * Seed transaction history for the "track your cards in and out" view
+ * (MVP feature #5: transaction tracking). A real backend would return the
+ * authenticated user's actual records.
+ */
 export const TRANSACTIONS: Transaction[] = [
   {
     id: "txn-1",

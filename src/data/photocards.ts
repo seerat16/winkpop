@@ -18,7 +18,11 @@ const SELLERS = [
   "danielle_dupes",
 ];
 
-function seeded(seed: number) {
+/**
+ * Small deterministic pseudo-random generator so the catalogue is identical on
+ * every run (stable snapshots, predictable tests) without pulling in a dep.
+ */
+function seeded(seed: number): () => number {
   let s = seed % 2147483647;
   if (s <= 0) s += 2147483646;
   return () => {
@@ -42,21 +46,28 @@ function priceForType(type: CardType, rand: () => number): number {
   return Math.round((min + rand() * (max - min)) * 100) / 100;
 }
 
+/**
+ * Build the marketplace catalogue: for every group × member × era we generate
+ * a couple of listings of varied type/condition/price.
+ */
 function buildPhotocards(): Photocard[] {
   const cards: Photocard[] = [];
-  let n = 1;
+  let seedCounter = 1;
+
   for (const group of GROUPS) {
     for (const member of group.members) {
       if (member.former) continue;
       for (const era of group.eras) {
-        const rand = seeded(n * 7919);
-        const count = 1 + Math.floor(rand() * 2);
+        const rand = seeded(seedCounter * 7919);
+        const count = 1 + Math.floor(rand() * 2); // 1–2 listings per combo
         for (let i = 0; i < count; i++) {
           const type = CARD_TYPES[Math.floor(rand() * CARD_TYPES.length)];
           const condition = CONDITIONS[Math.floor(rand() * CONDITIONS.length)];
           const intent = INTENTS[Math.floor(rand() * INTENTS.length)];
+          const damaged = condition === "Damaged";
+          const available = rand() > 0.12;
           cards.push({
-            id: `pc-${n}`,
+            id: `pc-${seedCounter}`,
             groupId: group.id,
             groupName: group.name,
             memberId: member.id,
@@ -67,13 +78,13 @@ function buildPhotocards(): Photocard[] {
             condition,
             price: priceForType(type, rand),
             intent,
-            available: rand() > 0.12,
-            damaged: condition === "Damaged",
+            available,
+            damaged,
             popularity: Math.round(rand() * 1000),
             sellerUsername: SELLERS[Math.floor(rand() * SELLERS.length)],
-            imgSeed: n,
+            imgSeed: seedCounter,
           });
-          n++;
+          seedCounter++;
         }
       }
     }
@@ -82,7 +93,11 @@ function buildPhotocards(): Photocard[] {
 }
 
 export const PHOTOCARDS: Photocard[] = buildPhotocards();
+
 export const PHOTOCARD_MAP: Record<string, Photocard> = Object.fromEntries(
   PHOTOCARDS.map((c) => [c.id, c]),
 );
-export const getPhotocard = (id: string) => PHOTOCARD_MAP[id];
+
+export function getPhotocard(id: string): Photocard | undefined {
+  return PHOTOCARD_MAP[id];
+}
