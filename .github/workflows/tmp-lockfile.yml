@@ -16,15 +16,10 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: npm install --save-dev @typescript-eslint/parser@^8
-      - uses: actions/upload-artifact@v4
-        with:
-          name: lockfile
-          path: |
-            package.json
-            package-lock.json
-      - name: Lint
-        continue-on-error: true
-        run: npx eslint src --ext .ts,.tsx --max-warnings 0 -f unix
-      - name: Unit tests
-        continue-on-error: true
-        run: npx vitest run --reporter=verbose
+      - name: Print lockfile patch
+        run: |
+          git diff -- package.json package-lock.json > lock.patch
+          echo "PATCH_SHA256 $(sha256sum lock.patch | cut -d' ' -f1)"
+          echo "=====BEGIN====="
+          gzip -9c lock.patch | base64 -w 120
+          echo "=====END====="
