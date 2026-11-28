@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
-import { Linking, Pressable, TextInput, View } from "react-native";
-import { useRouter } from "expo-router";
-import { Heart, Layers, Link2, Plus, Search } from "lucide-react-native";
+import { Pressable, TextInput, View } from "@/rn";
+import { Linking } from "@/rn/platform";
+import { useRouter } from "@/rn/router";
+import { Heart, Layers, Link2, Plus, Search } from "lucide-react";
 import type { Photocard, Post } from "@/data";
 import { EMPTY } from "@/data/appStore";
 import { useUserStore } from "@/data/userStore";
 import { colors } from "@/theme/colors";
-import { Chip } from "./Chip";
-import { intentLabel } from "./PhotocardTile";
+import { Chip } from "./ui";
+import { intentLabel } from "@/lib/format";
 import { PhotocardImage } from "./PhotocardImage";
 import { Text } from "./Text";
-import { Pill, Tabs } from "./ui";
+import { Pill, Tabs } from "./primitives";
 
 type Feed = "posts" | "listings" | "all";
 type ItemFilter = "all" | "trade" | "sale" | "available";

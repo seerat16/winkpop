@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, TextInput, View } from "react-native";
-import { Check, Search, X } from "lucide-react-native";
+import { Pressable, ScrollView, TextInput, View } from "@/rn";
+import { Check, Search, X } from "lucide-react";
 import {
   CATALOG_CATEGORIES,
   categoryForType,
@@ -11,10 +11,9 @@ import {
 } from "@/data";
 import { allListings } from "@/data/appStore";
 import { colors } from "@/theme/colors";
-import { Button } from "./Button";
-import { Chip } from "./Chip";
+import { Button, Chip } from "./ui";
 import { PhotocardImage } from "./PhotocardImage";
-import { Sheet } from "./ui";
+import { Sheet } from "./primitives";
 import { Text } from "./Text";
 
 interface PickerItem {

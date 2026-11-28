@@ -1,0 +1,6 @@
+# Supabase CLI config for the WinKPop payments backend.
+# `supabase functions deploy <name>` — the webhook must skip JWT checks
+# because Stripe calls it directly; every other function requires a signed-in user.
+
+[functions.stripe-webhook]
+verify_jwt = false

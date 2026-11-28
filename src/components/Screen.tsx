@@ -1,6 +1,5 @@
+import { SafeAreaView, ScrollView, View } from "@/rn";
 import type { ReactNode } from "react";
-import { ScrollView, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ScreenProps {
   children: ReactNode;

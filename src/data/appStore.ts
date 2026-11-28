@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { catalogIdForListing, getCatalogCard } from "./catalog";
@@ -157,6 +156,8 @@ interface AppState {
     opts: { payment: PaymentMethod; coupon?: string; shippingMethod?: ShippingMethod },
   ) => CheckoutResult;
   advanceOrder: (id: string) => void;
+  /** Replace/insert orders fetched from the payments backend. */
+  mergeLiveOrders: (orders: Order[]) => void;
   confirmReceived: (id: string) => void;
   uploadProof: (id: string) => void;
   leaveReview: (r: Omit<Review, "id" | "date" | "reviewer" | "reviewerCountry">, orderId?: string) => void;
@@ -239,7 +240,8 @@ export const useAppStore = create<AppState>()(
         createListings: (drafts) => {
           const created: UserListing[] = drafts.map((d) => ({
             ...d,
-            id: uid("ul"),
+            // UUIDs so the same id can be published to the payments backend.
+            id: globalThis.crypto?.randomUUID?.() ?? uid("ul"),
             imgSeed: d.imgSeed ?? Math.floor(Math.random() * 9000) + 1000,
             sellerUsername: me(),
             available: true,
@@ -521,6 +523,11 @@ export const useAppStore = create<AppState>()(
           notifyInternal({ kind: "order", text: `Purchase successful — ${cards.length} card${cards.length > 1 ? "s" : ""} on the way soon`, href: "/tracking" });
           return { success: true, orderIds: orders.map((o) => o.id) };
         },
+        mergeLiveOrders: (live) =>
+          set((s) => {
+            const ids = new Set(live.map((o) => o.id));
+            return { orders: [...live, ...s.orders.filter((o) => !ids.has(o.id))] };
+          }),
         advanceOrder: (id) =>
           set((s) => ({
             orders: s.orders.map((o) => {
@@ -595,7 +602,7 @@ export const useAppStore = create<AppState>()(
     {
       name: "winkpop-app",
       version: 1,
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 );

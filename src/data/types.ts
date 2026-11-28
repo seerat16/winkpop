@@ -115,7 +115,6 @@ export interface User {
   aboutMe: string;
   link?: string;
   socials: { instagram?: string; tiktok?: string; youtube?: string };
-  instagramLinked: boolean;
   /** Members per collected group; empty array = full group (§24D). */
   collectingMembers: Record<string, string[]>;
   priorityGroupIds: string[];
@@ -332,8 +331,6 @@ export interface CommunityUser {
   avatarColor: string;
   online: boolean;
   lastActive: string;
-  /** Instagram mutual of the demo user (for the "find mutuals" flow). */
-  instagramMutual?: boolean;
 }
 
 export type ReviewTag = "Quick shipper" | "Good communication" | "Friendly" | "Great packaging";

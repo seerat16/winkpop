@@ -61,7 +61,6 @@ export const COMMUNITY_USERS: CommunityUser[] = [
     lastActive: "Active now",
     followers: ["winkdemo", "biasbinder", "seoul_swaps"],
     following: ["biasbinder"],
-    instagramMutual: true,
   }),
   user({
     username: "biasbinder",
@@ -77,7 +76,6 @@ export const COMMUNITY_USERS: CommunityUser[] = [
     avatarColor: "#F4C06B",
     followers: ["pcfairy"],
     following: ["pcfairy", "winkdemo"],
-    instagramMutual: true,
   }),
   user({
     username: "seoul_swaps",
@@ -136,7 +134,6 @@ export const COMMUNITY_USERS: CommunityUser[] = [
     avatarColor: "#8ED1B8",
     availability: "vacation",
     lastActive: "3d ago",
-    instagramMutual: true,
   }),
   user({
     username: "karina_kollects",
@@ -150,7 +147,6 @@ export const COMMUNITY_USERS: CommunityUser[] = [
     collectingGroupIds: ["aespa"],
     avatarColor: "#8E7CC3",
     lastActive: "1h ago",
-    instagramMutual: true,
   }),
   user({
     username: "carat_cafe",

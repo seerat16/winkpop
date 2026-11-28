@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { REGISTERED_EMAILS } from "./community";
@@ -6,8 +5,8 @@ import { pruneExpiredCart, round2 } from "./commerce";
 import type { SavedSearch, User } from "./types";
 
 /**
- * Local-first user/session store. Persists to AsyncStorage, which works
- * identically on iOS, Android, and Web (localStorage under the hood).
+ * Local-first user/session store. Persists to localStorage, which Capacitor's
+ * WebView keeps on iOS and Android just like the browser does.
  *
  * This is the seam where a real auth/profile backend (e.g. Supabase) plugs in:
  * swap the body of `login`/`signup` to call the API, keep the same shape.
@@ -39,7 +38,6 @@ const PROFILE_DEFAULTS: Omit<
   availability: "available",
   aboutMe: "",
   socials: {},
-  instagramLinked: false,
   collectingMembers: {},
   priorityGroupIds: [],
   isPrivate: false,
@@ -144,7 +142,7 @@ interface UserState {
   setHydrated: () => void;
   login: (email: string, password: string) => Result;
   signup: (email: string, password: string) => Result;
-  loginWithProvider: (provider: "google" | "instagram") => void;
+  loginWithProvider: (provider: "google" | "apple") => void;
   requestPasswordReset: (email: string) => Result;
   loginDemo: () => void;
   logout: () => void;
@@ -238,7 +236,6 @@ export const useUserStore = create<UserState>()(
             user: {
               ...DEFAULT_USER,
               email: `${provider}@winkpop.app`,
-              instagramLinked: provider === "instagram" || DEFAULT_USER.instagramLinked,
             },
           });
         },
@@ -429,7 +426,7 @@ export const useUserStore = create<UserState>()(
     },
     {
       name: "winkpop-user",
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => localStorage),
       // Flip `hydrated` once persisted state has been read back from storage.
       onRehydrateStorage: () => (state) => {
         state?.setHydrated();

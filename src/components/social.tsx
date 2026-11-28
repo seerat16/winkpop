@@ -1,7 +1,7 @@
-import { Pressable, ScrollView, View } from "react-native";
-import { useRouter } from "expo-router";
-import { Bookmark, Heart, Layers, Link2, MessageCircle, Plus, Send } from "lucide-react-native";
-import { getCommunityUser, GROUP_MAP, type Conversation, type Photocard, type Post } from "@/data";
+import { Pressable, ScrollView, View } from "@/rn";
+import { useRouter } from "@/rn/router";
+import { Bookmark, Heart, Layers, Link2, MessageCircle, Plus, Send } from "lucide-react";
+import { getCommunityUser, GROUP_MAP, type Photocard, type Post } from "@/data";
 import { getAnyListing } from "@/data/appStore";
 import { useAppStore } from "@/data/appStore";
 import { useUserStore } from "@/data/userStore";
@@ -9,13 +9,9 @@ import { colors } from "@/theme/colors";
 import { PhotocardImage } from "./PhotocardImage";
 import { PhotocardTile } from "./PhotocardTile";
 import { Text } from "./Text";
-import { Avatar, Pill, timeAgo, Verified } from "./ui";
+import { Avatar, Pill, Verified } from "./primitives";
+import { avatarColorFor, timeAgo } from "@/lib/format";
 
-export function avatarColorFor(username: string): string {
-  const me = useUserStore.getState().user;
-  if (me?.username === username) return me.avatarColor ?? colors.purpleSoft;
-  return getCommunityUser(username)?.avatarColor ?? colors.purpleSoft;
-}
 
 /** Stories row with "Your story" bubble (§14R) and unseen rings (§14U). */
 export function StoriesRow() {
@@ -224,11 +220,6 @@ export function HorizontalCards({ ids }: { ids: string[] }) {
   );
 }
 
-/** Display title for a DM (other user) or group chat (name or member list). */
-export function conversationTitle(c: Conversation, me: string): string {
-  if (c.isGroup) return c.name ?? c.participants.filter((p) => p !== me).join(", ");
-  return c.participants.find((p) => p !== me) ?? me;
-}
 
 
 /** Coloured status badge for orders, trades and offers. */

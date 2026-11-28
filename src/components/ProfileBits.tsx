@@ -1,6 +1,7 @@
-import { Linking, Pressable, ScrollView, View } from "react-native";
-import { useRouter } from "expo-router";
-import { Plus } from "lucide-react-native";
+import { Pressable, ScrollView, View } from "@/rn";
+import { Linking } from "@/rn/platform";
+import { useRouter } from "@/rn/router";
+import { Plus } from "lucide-react";
 import type { Badge, Highlight } from "@/data";
 import { colors } from "@/theme/colors";
 import { PhotocardImage } from "./PhotocardImage";

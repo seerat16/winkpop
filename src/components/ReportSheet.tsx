@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { View } from "react-native";
+import { View } from "@/rn";
 import { REPORT_REASONS, type Report, type ReportReason } from "@/data";
 import { useAppStore } from "@/data/appStore";
-import { Button } from "./Button";
-import { Chip } from "./Chip";
-import { Field, Notice, Sheet } from "./ui";
+import { Button, Chip } from "./ui";
+import { Field, Notice, Sheet } from "./primitives";
 
 /** Report a listing, user, post or message (§22C, §22J). */
 export function ReportSheet({

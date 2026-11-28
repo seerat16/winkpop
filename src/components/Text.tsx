@@ -1,4 +1,4 @@
-import { Text as RNText, type TextProps } from "react-native";
+import { Text as RNText, type TextProps } from "@/rn";
 
 /**
  * Thin wrapper over RN Text that applies our default ink color and lets every
